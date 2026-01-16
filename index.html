@@ -10,118 +10,75 @@
 </head>
 
 <body>
-    <!-- Password Protection Overlay -->
+    <!-- Password Protection Overlay - Compact Mobile-First Design -->
     <div id="login-overlay" style="
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, #0a0a0c 0%, #1a1a2e 100%);
+        inset: 0;
+        background: #0a0a0f;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-        overflow: auto;
-        padding: 20px;
-        box-sizing: border-box;
     ">
-        <div style="text-align: center; max-width: 320px; padding: 24px;">
+        <div style="width: 100%; max-width: 280px; padding: 16px; text-align: center;">
+            <!-- Logo -->
             <div
-                style="width: 64px; height: 64px; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 28px; font-weight: 700; color: white;">
+                style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px;">
                 S</div>
-            <h2 style="color: #f0f0f5; font-size: 24px; margin-bottom: 8px; font-family: Inter, sans-serif;">Satya</h2>
-            <p style="color: #6b6b7b; font-size: 14px; margin-bottom: 24px; font-family: Inter, sans-serif;">Enter
-                password to continue</p>
-            <input type="password" id="login-password" placeholder="Password" style="
-                width: 100%;
-                padding: 14px 16px;
-                background: #141418;
-                border: 1px solid #2a2a35;
-                border-radius: 12px;
-                color: #f0f0f5;
-                font-size: 16px;
-                font-family: Inter, sans-serif;
-                outline: none;
-                margin-bottom: 16px;
-                box-sizing: border-box;
-            " onkeypress="if(event.key==='Enter') attemptLogin()">
-            <button onclick="attemptLogin()" style="
-                width: 100%;
-                padding: 14px 16px;
-                background: linear-gradient(135deg, #00DDB3 0%, #00c9a3 100%);
-                border: none;
-                border-radius: 24px;
-                color: #0a0a0c;
-                font-size: 16px;
-                font-weight: 600;
-                font-family: Inter, sans-serif;
-                cursor: pointer;
-            ">Unlock</button>
-            <p id="login-error"
-                style="color: #ef4444; font-size: 12px; margin-top: 12px; display: none; font-family: Inter, sans-serif;">
-                Incorrect password</p>
+            <h2 style="color: #fff; font-size: 20px; margin: 0 0 4px; font-family: Inter, sans-serif;">Satya</h2>
+            <p style="color: #666; font-size: 12px; margin: 0 0 16px; font-family: Inter, sans-serif;">Enter password to
+                continue</p>
 
-            <!-- API Key Setup (shows if no key stored) -->
-            <div id="api-key-setup"
-                style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #2a2a35; display: none;">
-                <p style="color: #a0a0b0; font-size: 12px; margin-bottom: 12px; font-family: Inter, sans-serif;">New
-                    device? Enter your OpenRouter API key:</p>
-                <input type="password" id="login-api-key" placeholder="sk-or-v1-..." style="
-                    width: 100%;
-                    padding: 12px 14px;
-                    background: #141418;
-                    border: 1px solid #2a2a35;
-                    border-radius: 10px;
-                    color: #f0f0f5;
-                    font-size: 13px;
-                    font-family: monospace;
-                    outline: none;
-                    box-sizing: border-box;
-                ">
-            </div>
+            <!-- Password Input -->
+            <input type="password" id="login-password" placeholder="Password" style="
+                width: 100%; padding: 12px; background: #1a1a20; border: 1px solid #333;
+                border-radius: 10px; color: #fff; font-size: 15px; font-family: Inter, sans-serif;
+                outline: none; margin-bottom: 10px; box-sizing: border-box;
+            " onkeypress="if(event.key==='Enter') attemptLogin()">
+
+            <!-- API Key Input (always visible now for simplicity) -->
+            <input type="text" id="login-api-key" placeholder="API Key (sk-or-v1-...)" style="
+                width: 100%; padding: 10px; background: #1a1a20; border: 1px solid #333;
+                border-radius: 10px; color: #0f8; font-size: 12px; font-family: monospace;
+                outline: none; margin-bottom: 12px; box-sizing: border-box;
+            ">
+
+            <!-- Unlock Button -->
+            <button onclick="attemptLogin()" style="
+                width: 100%; padding: 12px; background: #00DDB3; border: none;
+                border-radius: 20px; color: #000; font-size: 15px; font-weight: 600;
+                font-family: Inter, sans-serif; cursor: pointer;
+            ">Unlock</button>
+
+            <p id="login-error"
+                style="color: #f44; font-size: 11px; margin: 8px 0 0; display: none; font-family: Inter, sans-serif;">
+                Incorrect password</p>
         </div>
     </div>
 
     <script>
-        // Password hash (SHA-256 of "satya2026")
-        const PASSWORD_HASH = "a3f5b2c8d1e4f6a7b9c0d2e3f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4";
-
         // Check if already authenticated
-        if (localStorage.getItem('satya_auth') === PASSWORD_HASH) {
-            document.getElementById('login-overlay').style.display = 'none';
-        }
+        (function () {
+            const authKey = localStorage.getItem('satya_auth');
+            if (authKey === 'authenticated') {
+                document.getElementById('login-overlay').style.display = 'none';
+            }
+            // Pre-fill API key if stored
+            const storedKey = localStorage.getItem('satya_api_key');
+            if (storedKey) {
+                document.getElementById('login-api-key').value = storedKey;
+            }
+        })();
 
-        // Show API key setup if no key stored
-        if (!localStorage.getItem('satya_api_key')) {
-            document.getElementById('api-key-setup').style.display = 'block';
-        }
-
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function attemptLogin() {
+        function attemptLogin() {
             const password = document.getElementById('login-password').value;
-            const apiKeyInput = document.getElementById('login-api-key');
-            const hash = await hashPassword(password);
+            const apiKey = document.getElementById('login-api-key').value.trim();
 
-            // Simple password check - change this to your password
             if (password === 'satya2026') {
-                localStorage.setItem('satya_auth', hash);
-
-                // Save API key if provided
-                if (apiKeyInput && apiKeyInput.value.trim()) {
-                    localStorage.setItem('satya_api_key', apiKeyInput.value.trim());
+                localStorage.setItem('satya_auth', 'authenticated');
+                if (apiKey) {
+                    localStorage.setItem('satya_api_key', apiKey);
                 }
-
                 document.getElementById('login-overlay').style.display = 'none';
             } else {
                 document.getElementById('login-error').style.display = 'block';

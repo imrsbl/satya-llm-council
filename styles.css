@@ -2398,16 +2398,33 @@ body {
 
 @media (max-width: 600px) {
 
-    /* Compact Header */
+    /* Compact Header - Stack layout on mobile */
     .header {
         padding: 8px 12px;
         position: sticky;
         top: 0;
         z-index: 100;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .header-left {
+        width: 100%;
         gap: 8px;
+        flex-wrap: wrap;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .header-right {
+        display: none;
+        /* Hide on mobile to save space */
+    }
+
+    .logo {
+        flex-shrink: 0;
     }
 
     .logo-icon {
@@ -2420,19 +2437,18 @@ body {
         font-weight: 700;
     }
 
-    /* Scrollable Navigation with Fade Indicator */
+    /* Scrollable Navigation - Contained within viewport */
     .nav-tabs {
+        width: 100%;
+        max-width: 100%;
         flex-wrap: nowrap;
         overflow-x: auto;
+        overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         gap: 4px;
         padding: 4px 0;
-        margin: 0 -12px;
-        padding-left: 12px;
-        padding-right: 12px;
-        mask-image: linear-gradient(to right, black 85%, transparent 100%);
-        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        margin: 0;
     }
 
     .nav-tabs::-webkit-scrollbar {
@@ -2444,6 +2460,7 @@ body {
         padding: 6px 10px;
         font-size: 11px;
         border-radius: 16px;
+        white-space: nowrap;
     }
 
     /* Compact Headlines */

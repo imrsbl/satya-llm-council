@@ -531,8 +531,8 @@ function toggleFreeMode() {
     localStorage.setItem('satya_free_mode', state.freeMode);
     localStorage.setItem('satya_ultra_mode', state.ultraFreeMode);
 
-    // Reset selections when switching to avoid weird states
-    if (state.freeMode) {
+    // Only set a default selection if there are no existing selections
+    if (state.freeMode && state.selectedCouncilModels.length === 0) {
         state.selectedCouncilModels = [FREE_MODELS[0].id, FREE_MODELS[1].id, FREE_MODELS[2].id];
         state.selectedEnsembleModels = [FREE_MODELS[0].id, FREE_MODELS[1].id, FREE_MODELS[2].id];
     }
@@ -553,7 +553,8 @@ function toggleUltraFreeMode() {
     localStorage.setItem('satya_free_mode', state.freeMode);
     localStorage.setItem('satya_ultra_mode', state.ultraFreeMode);
 
-    if (state.ultraFreeMode) {
+    // Only set a default selection if there are no existing selections
+    if (state.ultraFreeMode && state.selectedCouncilModels.length === 0) {
         state.selectedCouncilModels = [ULTRA_FREE_MODELS[0].id, ULTRA_FREE_MODELS[1].id, ULTRA_FREE_MODELS[2].id];
         state.selectedEnsembleModels = [ULTRA_FREE_MODELS[0].id, ULTRA_FREE_MODELS[1].id, ULTRA_FREE_MODELS[2].id];
     }

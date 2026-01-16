@@ -385,7 +385,7 @@ function renderCouncilModels() {
     let baseModels = MODELS;
 
     if (state.ultraFreeMode) baseModels = ULTRA_FREE_MODELS;
-    else if (state.freeMode) baseModels = FREE_MODELS;
+    else if (state.freeMode) baseModels = ULTRA_FREE_MODELS; // freeMode now maps to Ultra Free
 
     // Apply filters
     let filteredModels = baseModels.filter(model => {
@@ -459,7 +459,7 @@ function renderEnsembleModels() {
     let baseModels = MODELS;
 
     if (state.ultraFreeMode) baseModels = ULTRA_FREE_MODELS;
-    else if (state.freeMode) baseModels = FREE_MODELS;
+    else if (state.freeMode) baseModels = ULTRA_FREE_MODELS; // freeMode now maps to Ultra Free
 
     // Apply filters
     let filteredModels = baseModels.filter(model => {
@@ -528,27 +528,7 @@ function renderEnsembleModels() {
     updateSelectionCounter('ensemble');
 }
 
-function toggleFreeMode() {
-    state.freeMode = !state.freeMode;
-    if (state.freeMode) {
-        state.ultraFreeMode = false;
-    }
-
-    localStorage.setItem('satya_free_mode', state.freeMode);
-    localStorage.setItem('satya_ultra_mode', state.ultraFreeMode);
-
-    // Only set a default selection if there are no existing selections
-    if (state.freeMode && state.selectedCouncilModels.length === 0) {
-        state.selectedCouncilModels = [FREE_MODELS[0].id, FREE_MODELS[1].id, FREE_MODELS[2].id];
-        state.selectedEnsembleModels = [FREE_MODELS[0].id, FREE_MODELS[1].id, FREE_MODELS[2].id];
-    }
-
-    renderCouncilModels();
-    renderEnsembleModels();
-    renderRoles();
-    hydrateModelSelects();
-    updateFreeModeToggleUI();
-}
+// toggleFreeMode removed - only Ultra Free mode is now available
 
 function toggleUltraFreeMode() {
     state.ultraFreeMode = !state.ultraFreeMode;
@@ -697,7 +677,7 @@ function hydrateModelSelects() {
     let filteredModels = MODELS;
 
     if (state.ultraFreeMode) filteredModels = ULTRA_FREE_MODELS;
-    else if (state.freeMode) filteredModels = FREE_MODELS;
+    else if (state.freeMode) filteredModels = ULTRA_FREE_MODELS; // freeMode now maps to Ultra Free
 
     if (chairmanSelect) {
         chairmanSelect.innerHTML = filteredModels.map(m =>
@@ -1159,7 +1139,7 @@ function renderRoles() {
                         ${(() => {
             let filtered;
             if (state.ultraFreeMode) filtered = ULTRA_FREE_MODELS;
-            else if (state.freeMode) filtered = FREE_MODELS;
+            else if (state.freeMode) filtered = ULTRA_FREE_MODELS; // freeMode now maps to Ultra Free
             else filtered = MODELS;
             return filtered.map(m => `<option value="${m.id}" ${role.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('');
         })()}
@@ -1186,7 +1166,7 @@ function updateRole(index, field, value) {
 function addRole() {
     let defaultModel;
     if (state.ultraFreeMode) defaultModel = ULTRA_FREE_MODELS[0].id;
-    else if (state.freeMode) defaultModel = FREE_MODELS[0].id;
+    else if (state.freeMode) defaultModel = ULTRA_FREE_MODELS[0].id; // freeMode now maps to Ultra Free
     else defaultModel = MODELS[0].id;
 
     state.roles.push({
@@ -2851,7 +2831,7 @@ function addCustomRole(roleData = null) {
     let defaultModel;
     if (state.ultraFreeMode) defaultModel = ULTRA_FREE_MODELS[0].id;
     else if (state.beastFreeMode) defaultModel = BEAST_FREE_MODELS[0].id;
-    else if (state.freeMode) defaultModel = FREE_MODELS[0].id;
+    else if (state.freeMode) defaultModel = ULTRA_FREE_MODELS[0].id; // freeMode now maps to Ultra Free
     else defaultModel = MODELS[0].id;
 
     const newRole = roleData || {

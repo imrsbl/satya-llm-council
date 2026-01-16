@@ -292,6 +292,96 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================
+// MOBILE MENU
+// ============================================
+
+function toggleMobileMenu() {
+    const dropdown = document.getElementById('mobile-menu-dropdown');
+    dropdown.classList.toggle('active');
+}
+
+function closeMobileMenu() {
+    const dropdown = document.getElementById('mobile-menu-dropdown');
+    dropdown.classList.remove('active');
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const dropdown = document.getElementById('mobile-menu-dropdown');
+    if (menuBtn && dropdown && !menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
+// ============================================
+// FULLSCREEN READER MODE
+// ============================================
+
+let lastTapTime = 0;
+
+function setupFullscreenReader() {
+    // Add double-tap listeners to response cards and synthesis
+    document.addEventListener('click', (e) => {
+        const now = Date.now();
+        const timeDiff = now - lastTapTime;
+
+        // Check if double-tap (less than 300ms between taps)
+        if (timeDiff < 300 && timeDiff > 0) {
+            // Find closest readable content
+            const responseCard = e.target.closest('.response-card');
+            const synthesisContent = e.target.closest('#synthesis-content');
+            const synthesisPanel = e.target.closest('#synthesis-panel');
+
+            if (responseCard) {
+                const content = responseCard.querySelector('.response-body, .response-content');
+                const header = responseCard.querySelector('.response-header h3, .response-header h4');
+                if (content) {
+                    openFullscreenReader(header?.textContent || 'Response', content.innerHTML);
+                }
+            } else if (synthesisContent || synthesisPanel) {
+                const content = document.getElementById('synthesis-content');
+                if (content) {
+                    openFullscreenReader('✨ Final Synthesis', content.innerHTML);
+                }
+            }
+        }
+        lastTapTime = now;
+    });
+}
+
+function openFullscreenReader(title, htmlContent) {
+    const reader = document.getElementById('fullscreen-reader');
+    const contentEl = document.getElementById('fullscreen-content');
+
+    if (reader && contentEl) {
+        contentEl.innerHTML = `<h3>${title}</h3>${htmlContent}`;
+        reader.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeFullscreenReader() {
+    const reader = document.getElementById('fullscreen-reader');
+    if (reader) {
+        reader.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// Close fullscreen on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeFullscreenReader();
+    }
+});
+
+// Initialize fullscreen reader
+document.addEventListener('DOMContentLoaded', () => {
+    setupFullscreenReader();
+});
+
+// ============================================
 // QUICK PROMPTS
 // ============================================
 
@@ -1876,30 +1966,51 @@ function updateResponseCard(id, content, status) {
 function autoFillMetadata(synthesisText) {
     if (!synthesisText) return;
 
+    console.log('autoFillMetadata called with text length:', synthesisText.length);
+
     const tagsInput = document.getElementById('session-tags');
     const notesInput = document.getElementById('session-notes');
 
-    // Try explicit TAGS format first
-    let tagsMatch = synthesisText.match(/TAGS:\s*\[?([^\]\n]+)\]?/i);
+    // Try multiple patterns for TAGS
+    // Pattern 1: TAGS: content (until next keyword or end)
+    let tagsMatch = synthesisText.match(/TAGS:\s*([^\n]+?)(?=\n(?:SUMMARY:|METADATA_END|\n)|$)/i);
+    if (!tagsMatch) {
+        // Pattern 2: TAGS: [bracketed content]
+        tagsMatch = synthesisText.match(/TAGS:\s*\[([^\]]+)\]/i);
+    }
+
     if (tagsMatch && tagsMatch[1] && tagsInput) {
-        tagsInput.value = tagsMatch[1].trim().replace(/[\[\]]/g, '');
+        const tags = tagsMatch[1].trim().replace(/[\[\]]/g, '');
+        console.log('Found TAGS:', tags);
+        tagsInput.value = tags;
     } else if (tagsInput && !tagsInput.value) {
         // Auto-generate tags from key terms in the synthesis
         const keyTerms = extractKeyTerms(synthesisText);
         if (keyTerms.length > 0) {
             tagsInput.value = keyTerms.slice(0, 5).join(', ');
+            console.log('Auto-generated tags:', tagsInput.value);
         }
     }
 
-    // Try explicit SUMMARY format first
-    let summaryMatch = synthesisText.match(/SUMMARY:\s*\[?([^\]\n]+)\]?/i);
+    // Try multiple patterns for SUMMARY
+    // Pattern 1: SUMMARY: content (until next keyword or end, can span lines)
+    let summaryMatch = synthesisText.match(/SUMMARY:\s*(.+?)(?=\n(?:METADATA_END|TAGS:|\n\n)|$)/is);
+    if (!summaryMatch) {
+        // Pattern 2: SUMMARY: [bracketed content]
+        summaryMatch = synthesisText.match(/SUMMARY:\s*\[([^\]]+)\]/i);
+    }
+
     if (summaryMatch && summaryMatch[1] && notesInput) {
-        notesInput.value = summaryMatch[1].trim().replace(/[\[\]]/g, '');
+        const summary = summaryMatch[1].trim().replace(/[\[\]]/g, '');
+        console.log('Found SUMMARY:', summary.substring(0, 100));
+        notesInput.value = summary.substring(0, 500);
     } else if (notesInput && !notesInput.value) {
-        // Auto-generate a brief summary from synthesis
-        const firstSentences = synthesisText.split(/[.!?]/).slice(0, 2).join('. ').trim();
+        // Auto-generate a brief summary from synthesis (skip metadata section)
+        let cleanText = synthesisText.replace(/METADATA_START[\s\S]*?METADATA_END/gi, '').trim();
+        const firstSentences = cleanText.split(/[.!?]/).slice(0, 2).join('. ').trim();
         if (firstSentences) {
             notesInput.value = firstSentences.substring(0, 200) + (firstSentences.length > 200 ? '...' : '');
+            console.log('Auto-generated summary');
         }
     }
 }
@@ -2064,8 +2175,13 @@ function exportCurrentResults() {
 }
 
 async function sendToNotion() {
+    console.log('sendToNotion called');
+
     const apiKey = localStorage.getItem('satya_notion_api_key');
     const databaseId = localStorage.getItem('satya_notion_db_id');
+
+    console.log('Notion API Key present:', !!apiKey, 'length:', apiKey?.length);
+    console.log('Notion Database ID:', databaseId);
 
     if (!apiKey || !databaseId) {
         alert('Please configure Notion API Key and Database ID in Settings first.');

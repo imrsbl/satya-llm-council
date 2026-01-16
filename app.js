@@ -2851,7 +2851,7 @@ function loadApiKey() {
     if (notionDb) document.getElementById('notion-db-id').value = notionDb;
 }
 
-function saveSettings() {
+async function saveSettings() {
     const apiKey = document.getElementById('api-key-input').value.trim();
     if (apiKey) {
         localStorage.setItem('satya_api_key', apiKey);
@@ -2870,12 +2870,17 @@ function saveSettings() {
 
     // Save to Firestore
     if (state.currentUser) {
-        fb.saveUserData(state.currentUser, "config", {
-            apiKey,
-            notionKey,
-            notionDb
-        }).then(() => console.log('✅ Config saved to Firestore'))
-            .catch(e => console.error('❌ Failed to save config:', e));
+        try {
+            await fb.saveUserData(state.currentUser, "config", {
+                apiKey,
+                notionKey,
+                notionDb
+            });
+            console.log('✅ Config saved to Firestore');
+        } catch (e) {
+            console.error('❌ Failed to save config:', e);
+            alert('⚠️ Settings saved locally, but Cloud Sync failed.\nReason: ' + e.message + '\n\nPlease fix your Firestore Rules in Firebase Console!');
+        }
     }
 
     closeSettings();

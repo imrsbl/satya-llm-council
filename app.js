@@ -437,6 +437,16 @@ async function firebaseLogout() {
         await fb.logout();
         alert('👋 Logged out successfully');
         state.currentUser = null;
+
+        // Clear active session keys to prevent leakage to next user
+        localStorage.removeItem('satya_api_key');
+        localStorage.removeItem('satya_notion_api_key');
+        localStorage.removeItem('satya_notion_db_id');
+        localStorage.removeItem('satya_auth'); // Just in case
+
+        // Reset defaults
+        localStorage.removeItem('satya_ultra_mode');
+
         location.reload();
     } catch (err) {
         alert('❌ Logout failed: ' + err.message);
@@ -463,6 +473,19 @@ async function initUserSession(uid) {
             updateFreeModeToggleUI();
         }
     }
+
+    // Load user-specific API keys from localStorage
+    const userApiKey = localStorage.getItem(`satya_api_key_${uid}`);
+    if (userApiKey) localStorage.setItem('satya_api_key', userApiKey);
+
+    const userNotionKey = localStorage.getItem(`satya_notion_api_key_${uid}`);
+    if (userNotionKey) localStorage.setItem('satya_notion_api_key', userNotionKey);
+
+    const userNotionDb = localStorage.getItem(`satya_notion_db_id_${uid}`);
+    if (userNotionDb) localStorage.setItem('satya_notion_db_id', userNotionDb);
+
+    // Refresh settings UI if open
+    loadApiKey();
 
     console.log('✅ User session initialized for:', uid);
 }
@@ -494,14 +517,18 @@ async function persistSettings() {
 }
 
 // Listen for auth state changes
+// Listen for auth state changes
 fb.onAuthStateChanged(fb.auth, async (user) => {
+    const overlay = document.getElementById('login-overlay');
     if (user) {
         console.log('🔐 User authenticated:', user.email);
+        if (overlay) overlay.style.display = 'none';
         await initUserSession(user.uid);
         updateAuthUI(true, user.email);
     } else {
         console.log('🔓 User not authenticated');
         state.currentUser = null;
+        if (overlay) overlay.style.display = 'flex';
         updateAuthUI(false);
     }
 });
@@ -1447,9 +1474,8 @@ async function streamResponse(model, prompt, systemPrompt = '', attachments = []
     const localEnabled = document.getElementById('local-llm-toggle')?.classList.contains('active');
 
     if (!localEnabled && !apiKey) {
-        document.getElementById('login-overlay').style.display = 'flex';
-        document.getElementById('login-error').textContent = 'Please enter your API Key to continue';
-        document.getElementById('login-error').style.display = 'block';
+        alert('🔑 Please configure your OpenRouter API Key in Settings to continue.');
+        showSettings();
         throw new Error('No API key provided');
     }
 
@@ -2772,6 +2798,7 @@ function exportHistoryItem(itemId) {
 // ============================================
 
 function showSettings() {
+    loadApiKey();
     document.getElementById('settings-modal').classList.remove('hidden');
 }
 
@@ -2801,18 +2828,30 @@ function saveSettings() {
     const apiKey = document.getElementById('api-key-input').value.trim();
     if (apiKey) {
         localStorage.setItem('satya_api_key', apiKey);
+        if (state.currentUser) localStorage.setItem(`satya_api_key_${state.currentUser}`, apiKey);
     } else {
         localStorage.removeItem('satya_api_key');
+        if (state.currentUser) localStorage.removeItem(`satya_api_key_${state.currentUser}`);
     }
 
     const notionKey = document.getElementById('notion-api-key').value.trim();
     const notionDb = document.getElementById('notion-db-id').value.trim();
 
-    if (notionKey) localStorage.setItem('satya_notion_api_key', notionKey);
-    else localStorage.removeItem('satya_notion_api_key');
+    if (notionKey) {
+        localStorage.setItem('satya_notion_api_key', notionKey);
+        if (state.currentUser) localStorage.setItem(`satya_notion_api_key_${state.currentUser}`, notionKey);
+    } else {
+        localStorage.removeItem('satya_notion_api_key');
+        if (state.currentUser) localStorage.removeItem(`satya_notion_api_key_${state.currentUser}`);
+    }
 
-    if (notionDb) localStorage.setItem('satya_notion_db_id', notionDb);
-    else localStorage.removeItem('satya_notion_db_id');
+    if (notionDb) {
+        localStorage.setItem('satya_notion_db_id', notionDb);
+        if (state.currentUser) localStorage.setItem(`satya_notion_db_id_${state.currentUser}`, notionDb);
+    } else {
+        localStorage.removeItem('satya_notion_db_id');
+        if (state.currentUser) localStorage.removeItem(`satya_notion_db_id_${state.currentUser}`);
+    }
 
     closeSettings();
     showCopyFeedback('Settings saved!');

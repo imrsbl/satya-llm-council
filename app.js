@@ -564,22 +564,28 @@ function updateAuthUI(isLoggedIn, email = '') {
     const loginBtn = document.getElementById('firebase-login-btn');
     const registerBtn = document.getElementById('firebase-register-btn');
     const googleLoginBtn = document.getElementById('google-login-btn');
-    const logoutBtn = document.getElementById('firebase-logout-btn');
-    const userEmail = document.getElementById('firebase-user-email');
+    const profileAvatar = document.getElementById('profile-avatar');
+    const profileInitial = document.getElementById('profile-initial');
 
-    if (loginBtn && registerBtn && logoutBtn) {
-        if (isLoggedIn) {
-            loginBtn.style.display = 'none';
-            if (googleLoginBtn) googleLoginBtn.style.display = 'none';
-            registerBtn.style.display = 'none';
-            logoutBtn.style.display = 'flex';
-            if (userEmail) userEmail.textContent = email;
-        } else {
-            loginBtn.style.display = 'flex';
-            if (googleLoginBtn) googleLoginBtn.style.display = 'flex';
-            registerBtn.style.display = 'flex';
-            logoutBtn.style.display = 'none';
+    if (isLoggedIn) {
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (googleLoginBtn) googleLoginBtn.style.display = 'none';
+        if (registerBtn) registerBtn.style.display = 'none';
+        if (profileAvatar) {
+            profileAvatar.style.display = 'flex';
+            // Set user initial from email
+            if (profileInitial && email) {
+                profileInitial.textContent = email.charAt(0).toUpperCase();
+            }
         }
+        // Store email for profile display
+        state.userEmail = email;
+    } else {
+        if (loginBtn) loginBtn.style.display = 'flex';
+        if (googleLoginBtn) googleLoginBtn.style.display = 'flex';
+        if (registerBtn) registerBtn.style.display = 'flex';
+        if (profileAvatar) profileAvatar.style.display = 'none';
+        state.userEmail = null;
     }
 }
 
@@ -2413,9 +2419,8 @@ async function sendToNotion() {
 
     showCopyFeedback('Sending to Notion...');
 
-    // Notion API via CORS Proxy
-    // corsproxy.io is often blocked. Switching to cors-anywhere.
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    // Notion API via CORS Proxy (corsproxy.io supports POST with proper encoding)
+    const proxyUrl = 'https://corsproxy.io/?';
     const notionUrl = 'https://api.notion.com/v1/pages';
 
     const body = {
@@ -2476,11 +2481,11 @@ async function sendToNotion() {
         });
     }
 
-    console.log('🌐 Sending request to:', proxyUrl + notionUrl);
+    console.log('🌐 Sending request to:', proxyUrl + encodeURIComponent(notionUrl));
     console.log('📦 Payload size:', JSON.stringify(body).length, 'bytes');
 
     try {
-        const response = await fetch(proxyUrl + notionUrl, {
+        const response = await fetch(proxyUrl + encodeURIComponent(notionUrl), {
             method: 'POST',
             headers: {
                 // 'Origin': window.location.origin, // cors-anywhere sometimes implies origin
@@ -2834,6 +2839,20 @@ function exportHistoryItem(itemId) {
 
 function showSettings() {
     loadApiKey();
+
+    // Populate profile section if logged in
+    const profileSection = document.getElementById('settings-profile-section');
+    const profileEmail = document.getElementById('settings-profile-email');
+    const profileInitial = document.getElementById('settings-profile-initial');
+
+    if (state.userEmail) {
+        if (profileSection) profileSection.style.display = 'block';
+        if (profileEmail) profileEmail.textContent = state.userEmail;
+        if (profileInitial) profileInitial.textContent = state.userEmail.charAt(0).toUpperCase();
+    } else {
+        if (profileSection) profileSection.style.display = 'none';
+    }
+
     document.getElementById('settings-modal').classList.remove('hidden');
 }
 
@@ -3225,3 +3244,23 @@ window.exportHistoryItem = exportHistoryItem;
 window.startCouncil = startCouncil;
 window.copyAllResults = copyAllResults;
 window.exportCurrentResults = exportCurrentResults;
+// Additional exposures for ALL onclick handlers
+window.closeMobileMenu = closeMobileMenu;
+window.logout = firebaseLogout; // alias
+window.closeFullscreenReader = closeFullscreenReader;
+window.triggerUpload = triggerUpload;
+window.toggleFilter = toggleFilter;
+window.savePreset = savePreset;
+window.loadPreset = loadPreset;
+window.startDxO = startDxO;
+window.addRole = addRole;
+window.loadTemplate = loadTemplate;
+window.startEnsemble = startEnsemble;
+window.startSuperChat = startSuperChat;
+window.selectBenchmark = selectBenchmark;
+window.toggleBenchmarkSelection = toggleBenchmarkSelection;
+window.startBenchmark = startBenchmark;
+window.saveSessionMeta = saveSessionMeta;
+window.continueResearch = continueResearch;
+window.renderLeaderboard = renderLeaderboard;
+window.switchTab = switchTab;

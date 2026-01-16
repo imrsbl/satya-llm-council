@@ -1880,9 +1880,9 @@ function autoFillMetadata(synthesisText) {
     const notesInput = document.getElementById('session-notes');
 
     // Try explicit TAGS format first
-    let tagsMatch = synthesisText.match(/TAGS:\\s*\\[?([^\\]\\n]+)\\]?/i);
+    let tagsMatch = synthesisText.match(/TAGS:\s*\[?([^\]\n]+)\]?/i);
     if (tagsMatch && tagsMatch[1] && tagsInput) {
-        tagsInput.value = tagsMatch[1].trim().replace(/[\\[\\]]/g, '');
+        tagsInput.value = tagsMatch[1].trim().replace(/[\[\]]/g, '');
     } else if (tagsInput && !tagsInput.value) {
         // Auto-generate tags from key terms in the synthesis
         const keyTerms = extractKeyTerms(synthesisText);
@@ -1892,9 +1892,9 @@ function autoFillMetadata(synthesisText) {
     }
 
     // Try explicit SUMMARY format first
-    let summaryMatch = synthesisText.match(/SUMMARY:\\s*\\[?([^\\]\\n]+)\\]?/i);
+    let summaryMatch = synthesisText.match(/SUMMARY:\s*\[?([^\]\n]+)\]?/i);
     if (summaryMatch && summaryMatch[1] && notesInput) {
-        notesInput.value = summaryMatch[1].trim().replace(/[\\[\\]]/g, '');
+        notesInput.value = summaryMatch[1].trim().replace(/[\[\]]/g, '');
     } else if (notesInput && !notesInput.value) {
         // Auto-generate a brief summary from synthesis
         const firstSentences = synthesisText.split(/[.!?]/).slice(0, 2).join('. ').trim();
@@ -1915,14 +1915,14 @@ function extractKeyTerms(text) {
         'same', 'so', 'than', 'too', 'very', 'just', 'can', 'this', 'that', 'these', 'those', 'it', 'its']);
 
     // Extract capitalized terms and technical words
-    const words = text.match(/\\b[A-Z][a-zA-Z0-9]+\\b/g) || [];
+    const words = text.match(/\b[A-Z][a-zA-Z0-9]+\b/g) || [];
     const uniqueTerms = [...new Set(words)]
         .filter(word => word.length > 3 && !stopWords.has(word.toLowerCase()))
         .slice(0, 10);
 
     // Also extract terms that appear multiple times
     const wordCounts = {};
-    const allWords = text.toLowerCase().match(/\\b[a-z]{4,}\\b/g) || [];
+    const allWords = text.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
     allWords.forEach(word => {
         if (!stopWords.has(word)) {
             wordCounts[word] = (wordCounts[word] || 0) + 1;

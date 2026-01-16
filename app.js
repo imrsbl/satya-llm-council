@@ -3401,3 +3401,75 @@ window.toggleProfilePanel = toggleProfilePanel;
 window.triggerPhotoUpload = triggerPhotoUpload;
 window.handlePhotoUpload = handlePhotoUpload;
 window.saveProfileSettings = saveProfileSettings;
+
+// ============================================
+// COMPREHENSIVE EVENT LISTENERS (DOM Ready)
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Profile Panel
+    const profileAvatar = document.getElementById('profile-avatar');
+    if (profileAvatar) {
+        profileAvatar.addEventListener('click', toggleProfilePanel);
+        console.log('✅ Profile avatar click attached');
+    }
+    
+    // Results panel buttons
+    setTimeout(() => {
+        const continueBtn = document.querySelector('[onclick*="continueSession"]');
+        const copyBtn = document.querySelector('[onclick*="copyAllResults"]');
+        const exportBtn = document.querySelector('[onclick*="exportCurrentResults"]');
+        
+        if (continueBtn) continueBtn.onclick = continueSession;
+        if (copyBtn) copyBtn.onclick = copyAllResults;
+        if (exportBtn) exportBtn.onclick = exportCurrentResults;
+        
+        console.log('✅ Results buttons patched');
+    }, 1000);
+});
+
+// Additional missing exposures
+window.continueSession = continueSession;
+window.autoPopulateSessionMeta = autoPopulateSessionMeta;
+
+// ============================================
+// AUTO-POPULATE SESSION METADATA
+// ============================================
+function autoPopulateSessionMeta() {
+    const synthesisContent = document.getElementById('synthesis-content')?.innerText || '';
+    const tagsInput = document.getElementById('session-tags');
+    const notesInput = document.getElementById('session-notes');
+    
+    if (!synthesisContent) return;
+    
+    // Extract key themes as tags (first 3-5 significant words)
+    const words = synthesisContent.split(/\s+/).filter(w => w.length > 5);
+    const uniqueWords = [...new Set(words)].slice(0, 5);
+    const suggestedTags = uniqueWords.join(', ');
+    
+    // Generate a summary note
+    const firstSentence = synthesisContent.split('.')[0]?.trim() || '';
+    const summaryNote = firstSentence.length > 200 
+        ? firstSentence.substring(0, 200) + '...' 
+        : firstSentence;
+    
+    // Populate if fields are empty
+    if (tagsInput && !tagsInput.value.trim()) {
+        tagsInput.value = suggestedTags;
+    }
+    if (notesInput && !notesInput.value.trim()) {
+        notesInput.value = `Key Finding: ${summaryNote}`;
+    }
+    
+    console.log('✅ Session metadata auto-populated');
+}
+
+// Call autoPopulate after synthesis is complete
+// Hook into the synthesis completion flow
+const originalShowCopyFeedback = showCopyFeedback;
+window.showCopyFeedback = function(msg) {
+    originalShowCopyFeedback(msg);
+    // Auto-populate after a short delay when results are shown
+    if (msg.includes('Success') || msg.includes('Complete')) {
+        setTimeout(autoPopulateSessionMeta, 500);
+    }
+};

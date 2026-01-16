@@ -3250,3 +3250,32 @@ body {
     color: rgba(255, 255, 255, 0.3);
     margin-top: 16px;
 }
+
+/* ========================================
+   MOBILE FIXES FOR PROFILE AVATAR
+   ======================================== */
+@media (max-width: 768px) {
+    .profile-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
+        min-width: 32px;
+        flex-shrink: 0;
+        z-index: 100;
+        position: relative;
+        pointer-events: auto !important;
+    }
+    
+    .header-right {
+        gap: 8px !important;
+    }
+    
+    .ultra-mode-container .mode-label {
+        display: none;
+    }
+    
+    .profile-panel-content {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}

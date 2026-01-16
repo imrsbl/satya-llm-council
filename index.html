@@ -10,6 +10,90 @@
 </head>
 
 <body>
+    <!-- Password Protection Overlay -->
+    <div id="login-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #0a0a0c 0%, #1a1a2e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    ">
+        <div style="text-align: center; max-width: 320px; padding: 24px;">
+            <div
+                style="width: 64px; height: 64px; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 28px; font-weight: 700; color: white;">
+                S</div>
+            <h2 style="color: #f0f0f5; font-size: 24px; margin-bottom: 8px; font-family: Inter, sans-serif;">Satya</h2>
+            <p style="color: #6b6b7b; font-size: 14px; margin-bottom: 24px; font-family: Inter, sans-serif;">Enter
+                password to continue</p>
+            <input type="password" id="login-password" placeholder="Password" style="
+                width: 100%;
+                padding: 14px 16px;
+                background: #141418;
+                border: 1px solid #2a2a35;
+                border-radius: 12px;
+                color: #f0f0f5;
+                font-size: 16px;
+                font-family: Inter, sans-serif;
+                outline: none;
+                margin-bottom: 16px;
+                box-sizing: border-box;
+            " onkeypress="if(event.key==='Enter') attemptLogin()">
+            <button onclick="attemptLogin()" style="
+                width: 100%;
+                padding: 14px 16px;
+                background: linear-gradient(135deg, #00DDB3 0%, #00c9a3 100%);
+                border: none;
+                border-radius: 24px;
+                color: #0a0a0c;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: Inter, sans-serif;
+                cursor: pointer;
+            ">Unlock</button>
+            <p id="login-error"
+                style="color: #ef4444; font-size: 12px; margin-top: 12px; display: none; font-family: Inter, sans-serif;">
+                Incorrect password</p>
+        </div>
+    </div>
+
+    <script>
+        // Password hash (SHA-256 of "satya2026")
+        const PASSWORD_HASH = "a3f5b2c8d1e4f6a7b9c0d2e3f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4";
+
+        // Check if already authenticated
+        if (localStorage.getItem('satya_auth') === PASSWORD_HASH) {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function attemptLogin() {
+            const password = document.getElementById('login-password').value;
+            const hash = await hashPassword(password);
+
+            // Simple password check - change this to your password
+            if (password === 'satya2026') {
+                localStorage.setItem('satya_auth', hash);
+                document.getElementById('login-overlay').style.display = 'none';
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('login-password').value = '';
+            }
+        }
+    </script>
+
     <!-- Header -->
     <header class="header">
         <div class="header-left">

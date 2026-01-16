@@ -2390,227 +2390,229 @@ body {
     font-size: 24px;
     font-weight: 700;
     color: var(--purple-accent);
-    /* ============================================
+}
+
+/* ============================================
    MOBILE OPTIMIZATIONS - ChatGPT Style
    ============================================ */
 
-    @media (max-width: 600px) {
+@media (max-width: 600px) {
 
-        /* Compact Header */
-        .header {
-            padding: 8px 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-left {
-            gap: 8px;
-        }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-        }
-
-        .logo-text {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        /* Scrollable Navigation with Fade Indicator */
-        .nav-tabs {
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 4px;
-            padding: 4px 0;
-            margin: 0 -12px;
-            padding-left: 12px;
-            padding-right: 12px;
-            mask-image: linear-gradient(to right, black 85%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
-        }
-
-        .nav-tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .nav-tab {
-            flex-shrink: 0;
-            padding: 6px 10px;
-            font-size: 11px;
-            border-radius: 16px;
-        }
-
-        /* Compact Headlines */
-        .mode-header {
-            padding: 16px 0 8px;
-        }
-
-        .mode-header h2 {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .mode-header p {
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        /* Main Content Padding */
-        .main-content {
-            padding: 0 12px 80px;
-        }
-
-        /* Model Selection Grid - Single Column */
-        .model-grid {
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        .model-card {
-            padding: 10px 12px;
-        }
-
-        .model-card h4 {
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .model-card p {
-            font-size: 10px;
-        }
-
-        .model-checkbox {
-            width: 18px;
-            height: 18px;
-        }
-
-        /* Input Areas */
-        .input-group textarea,
-        .input-group input {
-            font-size: 14px;
-            padding: 10px 12px;
-            min-height: 80px;
-        }
-
-        .input-group label {
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
-
-        /* Cards */
-        .research-card,
-        .model-response-card,
-        .synthesis-panel,
-        .config-card {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            justify-content: center;
-            padding: 12px 16px;
-            font-size: 14px;
-            border-radius: 24px;
-        }
-
-        .btn-primary {
-            margin-top: 8px;
-        }
-
-        /* Quick Templates */
-        .quick-templates {
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .template-chip {
-            font-size: 11px;
-            padding: 6px 10px;
-        }
-
-        /* Results Panel */
-        .results-header {
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-start;
-        }
-
-        .results-actions {
-            width: 100%;
-            display: flex;
-            gap: 8px;
-        }
-
-        .results-actions .btn {
-            flex: 1;
-        }
-
-        /* Model Response Cards */
-        .model-response-card .response-content {
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        /* Dropdowns */
-        select {
-            font-size: 13px;
-            padding: 10px 12px;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Chairman Selector */
-        .config-card label {
-            font-size: 12px;
-        }
-
-        /* Rounds Slider */
-        input[type="range"] {
-            height: 6px;
-        }
-
-        /* Hide less important elements on mobile */
-        .tooltip-text,
-        .model-tags {
-            display: none;
-        }
-
-        /* Floating Send Button */
-        .submit-section {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            z-index: 50;
-        }
+    /* Compact Header */
+    .header {
+        padding: 8px 12px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
     }
 
-    /* Even smaller screens */
-    @media (max-width: 380px) {
-        .nav-tab {
-            padding: 5px 8px;
-            font-size: 10px;
-        }
-
-        .mode-header h2 {
-            font-size: 18px;
-        }
-
-        .btn {
-            padding: 10px 14px;
-            font-size: 13px;
-        }
+    .header-left {
+        gap: 8px;
     }
+
+    .logo-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    /* Scrollable Navigation with Fade Indicator */
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 4px;
+        padding: 4px 0;
+        margin: 0 -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-tab {
+        flex-shrink: 0;
+        padding: 6px 10px;
+        font-size: 11px;
+        border-radius: 16px;
+    }
+
+    /* Compact Headlines */
+    .mode-header {
+        padding: 16px 0 8px;
+    }
+
+    .mode-header h2 {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .mode-header p {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    /* Main Content Padding */
+    .main-content {
+        padding: 0 12px 80px;
+    }
+
+    /* Model Selection Grid - Single Column */
+    .model-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .model-card {
+        padding: 10px 12px;
+    }
+
+    .model-card h4 {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .model-card p {
+        font-size: 10px;
+    }
+
+    .model-checkbox {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Input Areas */
+    .input-group textarea,
+    .input-group input {
+        font-size: 14px;
+        padding: 10px 12px;
+        min-height: 80px;
+    }
+
+    .input-group label {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    /* Cards */
+    .research-card,
+    .model-response-card,
+    .synthesis-panel,
+    .config-card {
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 16px;
+        font-size: 14px;
+        border-radius: 24px;
+    }
+
+    .btn-primary {
+        margin-top: 8px;
+    }
+
+    /* Quick Templates */
+    .quick-templates {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .template-chip {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    /* Results Panel */
+    .results-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .results-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+
+    .results-actions .btn {
+        flex: 1;
+    }
+
+    /* Model Response Cards */
+    .model-response-card .response-content {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    /* Dropdowns */
+    select {
+        font-size: 13px;
+        padding: 10px 12px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Chairman Selector */
+    .config-card label {
+        font-size: 12px;
+    }
+
+    /* Rounds Slider */
+    input[type="range"] {
+        height: 6px;
+    }
+
+    /* Hide less important elements on mobile */
+    .tooltip-text,
+    .model-tags {
+        display: none;
+    }
+
+    /* Floating Send Button */
+    .submit-section {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        z-index: 50;
+    }
+}
+
+/* Even smaller screens */
+@media (max-width: 380px) {
+    .nav-tab {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .mode-header h2 {
+        font-size: 18px;
+    }
+
+    .btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}

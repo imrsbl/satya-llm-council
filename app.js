@@ -164,7 +164,6 @@ let filterState = {
 function findModelById(modelId) {
     return MODELS.find(m => m.id === modelId) ||
         FREE_MODELS.find(m => m.id === modelId) ||
-        BEAST_FREE_MODELS.find(m => m.id === modelId) ||
         ULTRA_FREE_MODELS.find(m => m.id === modelId) ||
         { name: 'Unknown AI', provider: 'OpenRouter' };
 }

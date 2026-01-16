@@ -469,20 +469,28 @@ async function initUserSession(uid) {
     state.currentUser = uid;
 
     // Load saved history
-    const savedHistory = await fb.loadUserData(uid, "history");
-    if (Array.isArray(savedHistory)) {
-        state.history = savedHistory;
-        renderHistory();
-        updateHistoryStats();
+    try {
+        const savedHistory = await fb.loadUserData(uid, "history");
+        if (Array.isArray(savedHistory)) {
+            state.history = savedHistory;
+            renderHistory();
+            updateHistoryStats();
+        }
+    } catch (e) {
+        console.warn('⚠️ Could not load history (permission issues?)', e);
     }
 
     // Load saved settings
-    const savedSettings = await fb.loadUserData(uid, "settings");
-    if (savedSettings) {
-        if (savedSettings.ultraFreeMode !== undefined) {
-            state.ultraFreeMode = savedSettings.ultraFreeMode;
-            updateFreeModeToggleUI();
+    try {
+        const savedSettings = await fb.loadUserData(uid, "settings");
+        if (savedSettings) {
+            if (savedSettings.ultraFreeMode !== undefined) {
+                state.ultraFreeMode = savedSettings.ultraFreeMode;
+                updateFreeModeToggleUI();
+            }
         }
+    } catch (e) {
+        console.warn('⚠️ Could not load settings (permission issues?)', e);
     }
 
     // Load config (API Keys) from Firestore
@@ -537,7 +545,12 @@ fb.onAuthStateChanged(fb.auth, async (user) => {
     if (user) {
         console.log('🔐 User authenticated:', user.email);
         if (overlay) overlay.style.display = 'none';
-        await initUserSession(user.uid);
+        try {
+            await initUserSession(user.uid);
+        } catch (err) {
+            console.error('⚠️ Data Sync Error:', err);
+            // Don't block UI update on data sync error
+        }
         updateAuthUI(true, user.email);
     } else {
         console.log('🔓 User not authenticated');

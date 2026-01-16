@@ -259,7 +259,9 @@ let state = {
     sessionTags: [],
     roundsCount: 1,
     peerRankingEnabled: true,
-    currentSessionId: null
+    currentSessionId: null,
+    showAllModels: false,
+    showAllModelsEnsemble: false
 };
 
 
@@ -1154,290 +1156,370 @@ const OPENROUTER_API_KEY = ''; // REMOVED FOR SECURITY - User must provide key
 const FREE_MODELS = [
     { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', provider: 'Meta Free' },
     { id: 'deepseek/deepseek-r1-0528:free', name: 'DeepSeek R1', provider: 'DeepSeek Free' },
-    // ... (rest of models)
+    { id: 'google/gemma-3-27b-it:free', name: 'Gemma 3 27B', provider: 'Google Free' },
+    { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash', provider: 'Google Free' },
+    { id: 'qwen/qwen3-coder:free', name: 'Qwen3 Coder', provider: 'Alibaba Free' },
+    { id: 'xiaomi/mimo-v2-flash:free', name: 'MiMo-V2-Flash', provider: 'Xiaomi Free' },
+    { id: 'mistralai/devstral-2512:free', name: 'Devstral', provider: 'Mistral Free' },
+    { id: 'z-ai/glm-4.5-air:free', name: 'GLM 4.5 Air', provider: 'Z.AI Free' },
+    { id: 'nousresearch/hermes-3-llama-3.1-405b:free', name: 'Hermes 3 405B', provider: 'Nous Free' },
+    { id: 'moonshotai/kimi-k2:free', name: 'Kimi K2', provider: 'Moonshot Free' }
+];
 
-    // ...
+const ULTRA_FREE_MODELS = [
+    { id: 'nousresearch/hermes-3-llama-3.1-405b:free', name: 'Hermes 3 405B', provider: '#1 • 405B Params • Reasoning King' },
+    { id: 'deepseek/deepseek-r1-0528:free', name: 'DeepSeek R1', provider: '#2 • 671B MoE • Math & Code' },
+    { id: 'openai/gpt-oss-120b:free', name: 'GPT-OSS 120B', provider: '#3 • 120B Params • General' },
+    { id: 'qwen/qwen3-coder:free', name: 'Qwen3 Coder', provider: '#4 • 480B MoE • Agentic Coding' },
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', provider: '#5 • 70B Params • GPT-4 Level' },
+    { id: 'mistralai/devstral-2512:free', name: 'Devstral', provider: '#6 • 123B Params • Code Master' },
+    { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash', provider: '#7 • 1M Context • Multimodal' },
+    { id: 'tngtech/deepseek-r1t2-chimera:free', name: 'DeepSeek R1T2 Chimera', provider: '#8 • Hybrid Reasoning' },
+    { id: 'z-ai/glm-4.5-air:free', name: 'GLM 4.5 Air', provider: '#9 • Fast & Strong' },
+    { id: 'google/gemma-3-27b-it:free', name: 'Gemma 3 27B', provider: '#10 • 27B Params • Multilingual' },
+    { id: 'nvidia/nemotron-3-nano-30b-a3b:free', name: 'Nemotron 3 Nano 30B', provider: '#11 • 30B Params • Fast' },
+    { id: 'xiaomi/mimo-v2-flash:free', name: 'MiMo-V2-Flash', provider: '#12 • High-Speed Analyst' },
+    { id: 'openai/gpt-oss-20b:free', name: 'GPT-OSS 20B', provider: '#13 • 20B Params • Lightweight' },
+    { id: 'nvidia/nemotron-nano-12b-v2-vl:free', name: 'Nemotron Nano 12B VL', provider: '#14 • 12B Vision-Language' },
+    { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B', provider: '#15 • 7B Params • Compact' }
+];
 
-    async function streamResponse(model, prompt, systemPrompt = '', attachments = [], retryCount = 0) {
-        // Get key from storage, or empty string. NEVER use a hardcoded fallback in public code.
-        const apiKey = localStorage.getItem('satya_api_key') || '';
+const MODELS = [
+    { id: 'nousresearch/hermes-3-llama-3.1-405b:free', name: 'Hermes 3 405B', provider: 'Nous • 405B Reasoning King' },
+    { id: 'deepseek/deepseek-r1-0528:free', name: 'DeepSeek R1', provider: 'DeepSeek • 671B MoE Math/Code' },
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', provider: 'Meta • GPT-4 Level' },
+    { id: 'qwen/qwen3-coder:free', name: 'Qwen3 Coder', provider: 'Alibaba • Agentic Coding' },
+    { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash', provider: 'Google • 1M Context' },
+    { id: 'mistralai/devstral-2512:free', name: 'Devstral', provider: 'Mistral • Code Master' },
+    { id: 'google/gemma-3-27b-it:free', name: 'Gemma 3 27B', provider: 'Google • Multilingual' },
+    { id: 'z-ai/glm-4.5-air:free', name: 'GLM 4.5 Air', provider: 'Z.AI • Fast & Strong' },
+    { id: 'xiaomi/mimo-v2-flash:free', name: 'MiMo-V2-Flash', provider: 'Xiaomi • High-Speed' },
+    { id: 'moonshotai/kimi-k2:free', name: 'Kimi K2', provider: 'Moonshot • General' },
+    { id: 'tngtech/deepseek-r1t2-chimera:free', name: 'DeepSeek Chimera', provider: 'TNG • Hybrid Reasoning' },
+    { id: 'openai/gpt-5.2-pro', name: 'GPT-5.2 Pro', provider: 'OpenAI Premium' },
+    { id: 'openai/gpt-5.2-chat', name: 'GPT-5.2 Chat', provider: 'OpenAI Latest' },
+    { id: 'openai/gpt-5.1-codex-max', name: 'GPT-5.1 Codex Max', provider: 'OpenAI Code' },
+    { id: 'openai/gpt-5', name: 'GPT-5', provider: 'OpenAI' },
+    { id: 'openai/o4-mini', name: 'O4 Mini', provider: 'OpenAI Reasoning' },
+    { id: 'openai/o3', name: 'O3', provider: 'OpenAI Reasoning' },
+    { id: 'openai/o3-deep-research', name: 'O3 Deep Research', provider: 'OpenAI Deep' },
+    { id: 'openai/o1', name: 'O1', provider: 'OpenAI Reasoning' },
+    { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI Flagship' },
+    { id: 'x-ai/grok-4', name: 'Grok 4', provider: 'xAI Premium' },
+    { id: 'x-ai/grok-4.1-fast', name: 'Grok 4.1 Fast', provider: 'xAI Latest' },
+    { id: 'x-ai/grok-4-fast', name: 'Grok 4 Fast', provider: 'xAI Fast' },
+    { id: 'x-ai/grok-code-fast-1', name: 'Grok Code Fast 1', provider: 'xAI Code' },
+    { id: 'anthropic/claude-opus-4.5', name: 'Claude Opus 4.5', provider: 'Anthropic Premium' },
+    { id: 'anthropic/claude-sonnet-4.5', name: 'Claude Sonnet 4.5', provider: 'Anthropic Latest' },
+    { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'Anthropic' },
+    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'Anthropic' },
+    { id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash', provider: 'Google Latest' },
+    { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'Google Fast' },
+    { id: 'deepseek/deepseek-v3.2', name: 'DeepSeek V3.2', provider: 'DeepSeek Latest' },
+    { id: 'deepseek/deepseek-r1', name: 'DeepSeek R1', provider: 'DeepSeek Reasoning' },
+    { id: 'deepseek/deepseek-chat', name: 'DeepSeek V3', provider: 'DeepSeek' },
+    { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B (Paid)', provider: 'Meta Premium' },
+    { id: 'meta-llama/llama-3.1-405b-instruct', name: 'Llama 3.1 405B', provider: 'Meta Premium' },
+    { id: 'mistralai/mistral-large-2411', name: 'Mistral Large', provider: 'Mistral AI' },
+    { id: 'qwen/qwen-2.5-72b-instruct', name: 'Qwen 2.5 72B', provider: 'Alibaba' }
+];
 
-        // Check if key is missing for non-local requests
-        const localEnabled = document.getElementById('local-llm-toggle')?.classList.contains('active');
+const MODEL_METADATA = {
+    'meta-llama/llama-3.3-70b-instruct:free': { tags: ['Reasoning', 'Fast'], developer: 'Meta', description: 'GPT-4 level performance', tooltip: 'Top for complex reasoning chains, excellent instruction following' },
+    'deepseek/deepseek-r1-0528:free': { tags: ['Reasoning', 'Coding'], developer: 'DeepSeek', description: '671B MoE reasoning model', tooltip: 'Best for math and code, step-by-step reasoning chains' },
+    'google/gemma-3-27b-it:free': { tags: ['Fast', 'Multimodal'], developer: 'Google', description: 'Multilingual expert', tooltip: 'Excellent multilingual support, fast inference speed' },
+    'google/gemini-2.0-flash-exp:free': { tags: ['Fast', 'Multimodal'], developer: 'Google', description: '1M context multimodal', tooltip: 'Massive context window, vision capabilities, very fast' },
+    'qwen/qwen3-coder:free': { tags: ['Coding', 'Reasoning'], developer: 'Alibaba', description: 'Agentic coding specialist', tooltip: 'Top for agentic coding tasks, excellent tool use' },
+    'xiaomi/mimo-v2-flash:free': { tags: ['Fast'], developer: 'Xiaomi', description: 'High-speed analyst', tooltip: 'Ultra-fast inference, good for quick analysis' },
+    'mistralai/devstral-2512:free': { tags: ['Coding'], developer: 'Mistral', description: 'Code master 123B', tooltip: 'Specialized for code generation and review' },
+    'z-ai/glm-4.5-air:free': { tags: ['Fast', 'Reasoning'], developer: 'Z.AI', description: 'Fast context specialist', tooltip: 'Fast and strong general reasoning' },
+    'nousresearch/hermes-3-llama-3.1-405b:free': { tags: ['Reasoning'], developer: 'Nous', description: '405B reasoning king', tooltip: 'Largest free model, best for complex reasoning' },
+    'moonshotai/kimi-k2:free': { tags: ['Reasoning', 'Fast'], developer: 'Moonshot', description: 'General purpose', tooltip: 'Balanced performance across tasks' },
+    'openai/gpt-oss-120b:free': { tags: ['Reasoning'], developer: 'OpenAI', description: '120B params general', tooltip: 'Strong general capability model' },
+    'tngtech/deepseek-r1t2-chimera:free': { tags: ['Reasoning'], developer: 'TNG', description: 'Hybrid reasoning', tooltip: 'Enhanced reasoning capabilities' },
+    'nvidia/nemotron-3-nano-30b-a3b:free': { tags: ['Fast'], developer: 'NVIDIA', description: '30B fast inference', tooltip: 'Optimized for speed' },
+    'openai/gpt-oss-20b:free': { tags: ['Fast'], developer: 'OpenAI', description: '20B lightweight', tooltip: 'Fast and efficient' },
+    'nvidia/nemotron-nano-12b-v2-vl:free': { tags: ['Multimodal', 'Fast'], developer: 'NVIDIA', description: 'Vision-Language', tooltip: 'Multimodal vision capabilities' },
+    'mistralai/mistral-7b-instruct:free': { tags: ['Fast'], developer: 'Mistral', description: '7B compact', tooltip: 'Very fast, good for simple tasks' },
+    'openai/gpt-5.2-pro': { tags: ['Reasoning', 'Coding', 'Multimodal'], developer: 'OpenAI', description: 'Premium flagship', tooltip: 'Best-in-class across all benchmarks' },
+    'openai/gpt-5.2-chat': { tags: ['Reasoning', 'Multimodal'], developer: 'OpenAI', description: 'Chat optimized', tooltip: 'Optimized for conversational AI' },
+    'openai/gpt-5.1-codex-max': { tags: ['Coding'], developer: 'OpenAI', description: 'Code specialist', tooltip: 'Best for code generation' },
+    'openai/gpt-5.1-chat': { tags: ['Reasoning'], developer: 'OpenAI', description: 'Previous gen chat', tooltip: 'Strong general performance' },
+    'openai/gpt-5': { tags: ['Reasoning'], developer: 'OpenAI', description: 'GPT-5 base', tooltip: 'Foundation GPT-5 model' },
+    'openai/o4-mini': { tags: ['Reasoning', 'Fast'], developer: 'OpenAI', description: 'Fast reasoning', tooltip: 'Quick reasoning model' },
+    'openai/o3': { tags: ['Reasoning'], developer: 'OpenAI', description: 'Deep reasoning', tooltip: 'Advanced reasoning chains' },
+    'openai/o3-deep-research': { tags: ['Reasoning'], developer: 'OpenAI', description: 'Research specialist', tooltip: 'Optimized for research tasks' },
+    'openai/o1': { tags: ['Reasoning'], developer: 'OpenAI', description: 'Original o1', tooltip: 'First reasoning model' },
+    'openai/gpt-4o': { tags: ['Reasoning', 'Multimodal'], developer: 'OpenAI', description: 'Multimodal flagship', tooltip: 'Vision and audio capable' },
+    'x-ai/grok-4': { tags: ['Reasoning'], developer: 'xAI', description: 'Premium Grok', tooltip: 'xAI flagship model' },
+    'x-ai/grok-4.1-fast': { tags: ['Reasoning', 'Fast'], developer: 'xAI', description: 'Fast Grok', tooltip: 'Speed optimized Grok' },
+    'x-ai/grok-4-fast': { tags: ['Fast'], developer: 'xAI', description: 'Quick inference', tooltip: 'Very fast responses' },
+    'x-ai/grok-code-fast-1': { tags: ['Coding', 'Fast'], developer: 'xAI', description: 'Code specialist', tooltip: 'Fast code generation' },
+    'anthropic/claude-opus-4.5': { tags: ['Reasoning', 'Coding'], developer: 'Anthropic', description: 'Premium Claude', tooltip: 'Best-in-class reasoning and coding' },
+    'anthropic/claude-sonnet-4.5': { tags: ['Reasoning', 'Coding'], developer: 'Anthropic', description: 'Latest Sonnet', tooltip: 'Excellent balance of speed and capability' },
+    'anthropic/claude-sonnet-4': { tags: ['Reasoning'], developer: 'Anthropic', description: 'Previous Sonnet', tooltip: 'Strong general performance' },
+    'anthropic/claude-3.5-sonnet': { tags: ['Reasoning', 'Coding'], developer: 'Anthropic', description: 'Claude 3.5', tooltip: 'Proven reliable performance' },
+    'google/gemini-3-flash-preview': { tags: ['Fast', 'Multimodal'], developer: 'Google', description: 'Preview flash', tooltip: 'Latest Gemini preview' },
+    'google/gemini-2.5-flash': { tags: ['Fast', 'Multimodal'], developer: 'Google', description: 'Fast Gemini', tooltip: 'Speed optimized multimodal' },
+    'deepseek/deepseek-v3.2': { tags: ['Reasoning', 'Coding'], developer: 'DeepSeek', description: 'Latest DeepSeek', tooltip: 'Strong reasoning and code' },
+    'deepseek/deepseek-r1': { tags: ['Reasoning'], developer: 'DeepSeek', description: 'R1 reasoning', tooltip: 'Specialized reasoning model' },
+    'deepseek/deepseek-chat': { tags: ['Reasoning'], developer: 'DeepSeek', description: 'DeepSeek V3', tooltip: 'General chat model' },
+    'meta-llama/llama-3.3-70b-instruct': { tags: ['Reasoning', 'Fast'], developer: 'Meta', description: 'Llama 3.3 paid', tooltip: 'Premium Llama access' },
+    'meta-llama/llama-3.1-405b-instruct': { tags: ['Reasoning'], developer: 'Meta', description: '405B flagship', tooltip: 'Largest Llama model' },
+    'mistralai/mistral-large-2411': { tags: ['Reasoning', 'Coding'], developer: 'Mistral', description: 'Mistral Large', tooltip: 'Flagship Mistral model' },
+    'qwen/qwen-2.5-72b-instruct': { tags: ['Reasoning', 'Coding'], developer: 'Alibaba', description: 'Qwen 2.5 72B', tooltip: 'Strong multilingual model' }
+};
 
-        if (!localEnabled && !apiKey) {
-            // Trigger login if no key
-            document.getElementById('login-overlay').style.display = 'flex';
-            document.getElementById('login-error').textContent = 'Please enter your API Key to continue';
-            document.getElementById('login-error').style.display = 'block';
-            throw new Error('No API key provided');
-        }
+const OPENROUTER_API_KEY = ''; // REMOVED FOR SECURITY - User must provide key
 
-        const localEndpoint = document.getElementById('local-endpoint-input')?.value || 'http://localhost:11434/v1';
+async function streamResponse(model, prompt, systemPrompt = '', attachments = [], retryCount = 0) {
+    const apiKey = localStorage.getItem('satya_api_key') || '';
+    const localEnabled = document.getElementById('local-llm-toggle')?.classList.contains('active');
 
-        // Choose endpoint based on local toggle
-        const url = localEnabled ? `${localEndpoint}/chat/completions` : 'https://openrouter.ai/api/v1/chat/completions';
-
-        const MAX_RETRIES = 3;
-
-        try {
-            const messages = [];
-            if (systemPrompt) {
-                messages.push({ role: 'system', content: systemPrompt });
-            }
-
-            // Handle multimodal content
-            let content;
-            if (attachments && attachments.length > 0) {
-                content = [{ type: 'text', text: prompt }];
-                for (const attachment of attachments) {
-                    if (attachment.type.startsWith('image/')) {
-                        content.push({
-                            type: 'image_url',
-                            image_url: { url: attachment.data }
-                        });
-                    } else {
-                        content.push({
-                            type: 'text',
-                            text: `[File Attachment: ${attachment.name}]`
-                        });
-                    }
-                }
-            } else {
-                content = prompt;
-            }
-
-            messages.push({ role: 'user', content: content });
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': localEnabled ? '' : `Bearer ${apiKey}`,
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'Satya AI Council'
-                },
-                body: JSON.stringify({
-                    model: model,
-                    messages: messages,
-                    stream: true,
-                    max_tokens: 4000
-                })
-            });
-
-            // HANDLE 401 UNAUTHORIZED (Key Revoked/Invalid)
-            if (response.status === 401) {
-                console.error("API Key Rejected (401). Clearing stored key.");
-                localStorage.removeItem('satya_api_key');
-                localStorage.removeItem('satya_auth'); // Force re-login
-
-                // Show Login Overlay with specific message
-                document.getElementById('login-overlay').style.display = 'flex';
-                const errorMsg = document.getElementById('login-error');
-                if (errorMsg) {
-                    errorMsg.textContent = 'Action Required: Your API Key is invalid or expired. Please update it.';
-                    errorMsg.style.display = 'block';
-                    errorMsg.style.color = '#ff4444';
-                }
-                throw new Error('API Key Invalid - Please update in Login');
-            }
-
-            if (response.status === 429 && retryCount < MAX_RETRIES && !localEnabled) {
-                const delay = Math.pow(2, retryCount) * 1000 + (Math.random() * 1000);
-                console.warn(`Rate limited (429). Retrying in ${Math.round(delay)}ms...`);
-                await sleep(delay);
-                return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
-            }
-
-            if (!response.ok) {
-                // If local fail, potentially fallback to OpenRouter
-                if (localEnabled) {
-                    console.error(`Local LLM error: ${response.status}. Falling back to OpenRouter...`);
-                    // Disable local toggle for this call and retry
-                    return streamResponse(model, prompt, systemPrompt, attachments, retryCount, false);
-                }
-                throw new Error(`API error: ${response.status}`);
-            }
-
-            return response.body.getReader();
-        } catch (error) {
-            if (error.message.includes('API Key Invalid')) throw error; // Don't retry invalid keys
-
-            if (retryCount < MAX_RETRIES) {
-                await sleep(1000);
-                return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
-            }
-            throw error;
-        }
+    if (!localEnabled && !apiKey) {
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('login-error').textContent = 'Please enter your API Key to continue';
+        document.getElementById('login-error').style.display = 'block';
+        throw new Error('No API key provided');
     }
+
+    const localEndpoint = document.getElementById('local-endpoint-input')?.value || 'http://localhost:11434/v1';
+    const url = localEnabled ? `${localEndpoint}/chat/completions` : 'https://openrouter.ai/api/v1/chat/completions';
+    const MAX_RETRIES = 3;
+
+    try {
+        const messages = [];
+        if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+
+        let content;
+        if (attachments && attachments.length > 0) {
+            content = [{ type: 'text', text: prompt }];
+            for (const attachment of attachments) {
+                if (attachment.type.startsWith('image/')) {
+                    content.push({ type: 'image_url', image_url: { url: attachment.data } });
+                } else {
+                    content.push({ type: 'text', text: `[File Attachment: ${attachment.name}]` });
+                }
+            }
+        } else {
+            content = prompt;
+        }
+
+        messages.push({ role: 'user', content: content });
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localEnabled ? '' : `Bearer ${apiKey}`,
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'Satya AI Council'
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: messages,
+                stream: true,
+                max_tokens: 4000
+            })
+        });
+
+        if (response.status === 401) {
+            localStorage.removeItem('satya_api_key');
+            localStorage.removeItem('satya_auth');
+            document.getElementById('login-overlay').style.display = 'flex';
+            const errorMsg = document.getElementById('login-error');
+            if (errorMsg) {
+                errorMsg.textContent = 'Action Required: Your API Key is invalid or expired.';
+                errorMsg.style.display = 'block';
+            }
+            throw new Error('API Key Invalid');
+        }
+
+        if (response.status === 429 && retryCount < MAX_RETRIES && !localEnabled) {
+            const delay = Math.pow(2, retryCount) * 1000 + (Math.random() * 1000);
+            await sleep(delay);
+            return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
+        }
+
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        return response.body.getReader();
+    } catch (error) {
+        if (error.message.includes('API Key Invalid')) throw error;
+        if (retryCount < MAX_RETRIES) {
+            await sleep(1000);
+            return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
+        }
+        throw error;
+    }
+}
 
 async function processStream(reader, onChunk, onComplete) {
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let fullContent = '';
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullContent = '';
 
-        try {
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
 
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        if (data === '[DONE]') continue;
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.slice(6);
+                    if (data === '[DONE]') continue;
 
-                        try {
-                            const json = JSON.parse(data);
-                            const content = json.choices?.[0]?.delta?.content;
-                            if (content) {
-                                fullContent += content;
-                                onChunk(content, fullContent);
-                            }
-                        } catch (e) {
-                            // Skip invalid JSON
+                    try {
+                        const json = JSON.parse(data);
+                        const content = json.choices?.[0]?.delta?.content;
+                        if (content) {
+                            fullContent += content;
+                            onChunk(content, fullContent);
                         }
+                    } catch (e) {
+                        // Skip invalid JSON
                     }
                 }
             }
-        } catch (error) {
-            console.error('Stream error:', error);
         }
-
-        onComplete(fullContent);
+    } catch (error) {
+        console.error('Stream error:', error);
     }
+
+    onComplete(fullContent);
+}
 
 // ============================================
 // COUNCIL MODE
 // ============================================
 
 async function startCouncil(isContinue = false) {
-        const originalPrompt = document.getElementById('council-prompt').value.trim();
-        if (!originalPrompt) {
-            alert('Please enter a research prompt.');
-            return;
-        }
+    const originalPrompt = document.getElementById('council-prompt').value.trim();
+    if (!originalPrompt) {
+        alert('Please enter a research prompt.');
+        return;
+    }
 
-        if (state.selectedCouncilModels.length < 2) {
-            alert('Please select at least 2 models for the council.');
-            return;
-        }
+    if (state.selectedCouncilModels.length < 2) {
+        alert('Please select at least 2 models for the council.');
+        return;
+    }
 
-        // Refresh state from UI elements
-        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('council-rounds')?.value || 1);
-        state.peerRankingEnabled = document.getElementById('council-peer-ranking-toggle')?.classList.contains('active');
-        const chairman = document.getElementById('chairman-select').value;
+    // Refresh state from UI elements
+    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('council-rounds')?.value || 1);
+    state.peerRankingEnabled = document.getElementById('council-peer-ranking-toggle')?.classList.contains('active');
+    const chairman = document.getElementById('chairman-select').value;
 
-        if (!isContinue) showResults('Council Deliberation');
-        else document.getElementById('results-panel').classList.remove('hidden');
+    if (!isContinue) showResults('Council Deliberation');
+    else document.getElementById('results-panel').classList.remove('hidden');
 
+    const responsesContainer = document.getElementById('model-responses');
+    const existingSynthesis = document.getElementById('synthesis-content').textContent;
+
+    let currentContext = isContinue ? `Initial Prompt: ${originalPrompt}\n\nPrevious Synthesis: ${existingSynthesis}\n\nTask: Continue the research, refine details, and address unexplored angles.` : originalPrompt;
+    let finalModelResponses = {};
+    let finalSynthesis = '';
+
+    const totalRoundsToRun = roundsToRun;
+
+    for (let round = 1; round <= totalRoundsToRun; round++) {
+        // If continuing, we treat this as a new round offset by existing state if we tracked it, 
+        // but for now let's just label it "Continued Research"
+        const displayRound = isContinue ? 'Continuation' : round;
+        const roundTitle = !isContinue && totalRoundsToRun > 1 ? ` (Round ${round}/${totalRoundsToRun})` : (isContinue ? ' (Continuation)' : '');
+        document.getElementById('results-title').textContent = `Council Deliberation${roundTitle}`;
+
+        const modelResponses = {};
         const responsesContainer = document.getElementById('model-responses');
-        const existingSynthesis = document.getElementById('synthesis-content').textContent;
 
-        let currentContext = isContinue ? `Initial Prompt: ${originalPrompt}\n\nPrevious Synthesis: ${existingSynthesis}\n\nTask: Continue the research, refine details, and address unexplored angles.` : originalPrompt;
-        let finalModelResponses = {};
-        let finalSynthesis = '';
+        // Clear or prepare container for round
+        if (round === 1) responsesContainer.innerHTML = '';
 
-        const totalRoundsToRun = roundsToRun;
+        // Add round header if multi-round
+        if (state.roundsCount > 1) {
+            const roundHeader = document.createElement('div');
+            roundHeader.className = 'round-header';
+            roundHeader.style = 'grid-column: 1 / -1; margin: 20px 0 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; font-weight: 700; color: var(--teal-accent);';
+            roundHeader.innerHTML = `ROUND ${round}: ${round === 1 ? 'Initial Analysis' : 'Deepening Insights'}`;
+            responsesContainer.appendChild(roundHeader);
+        }
 
-        for (let round = 1; round <= totalRoundsToRun; round++) {
-            // If continuing, we treat this as a new round offset by existing state if we tracked it, 
-            // but for now let's just label it "Continued Research"
-            const displayRound = isContinue ? 'Continuation' : round;
-            const roundTitle = !isContinue && totalRoundsToRun > 1 ? ` (Round ${round}/${totalRoundsToRun})` : (isContinue ? ' (Continuation)' : '');
-            document.getElementById('results-title').textContent = `Council Deliberation${roundTitle}`;
+        // Create individual cards for this round
+        state.selectedCouncilModels.forEach(modelId => {
+            const model = findModelById(modelId);
+            const cardId = `${modelId}-round-${round}`;
+            const cardHtml = createResponseCard(model.name, model.provider, cardId);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = cardHtml;
+            responsesContainer.appendChild(tempDiv.firstElementChild);
+        });
 
-            const modelResponses = {};
-            const responsesContainer = document.getElementById('model-responses');
-
-            // Clear or prepare container for round
-            if (round === 1) responsesContainer.innerHTML = '';
-
-            // Add round header if multi-round
-            if (state.roundsCount > 1) {
-                const roundHeader = document.createElement('div');
-                roundHeader.className = 'round-header';
-                roundHeader.style = 'grid-column: 1 / -1; margin: 20px 0 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; font-weight: 700; color: var(--teal-accent);';
-                roundHeader.innerHTML = `ROUND ${round}: ${round === 1 ? 'Initial Analysis' : 'Deepening Insights'}`;
-                responsesContainer.appendChild(roundHeader);
-            }
-
-            // Create individual cards for this round
-            state.selectedCouncilModels.forEach(modelId => {
-                const model = findModelById(modelId);
-                const cardId = `${modelId}-round-${round}`;
-                const cardHtml = createResponseCard(model.name, model.provider, cardId);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cardHtml;
-                responsesContainer.appendChild(tempDiv.firstElementChild);
-            });
-
-            const roundPromises = state.selectedCouncilModels.map(async (modelId) => {
-                const cardId = `${modelId}-round-${round}`;
-                const systemPrompt = `You are a member of an AI council. 
+        const roundPromises = state.selectedCouncilModels.map(async (modelId) => {
+            const cardId = `${modelId}-round-${round}`;
+            const systemPrompt = `You are a member of an AI council. 
             ${round > 1 ? `This is Round ${round} of the deliberation. Build upon the previous synthesis to provide deeper technical insights.` : 'Provide your initial expert analysis.'}
             Focus on accuracy, edge cases, and verifiable facts.`;
 
-                const attemptRequest = async (retry = false) => {
-                    try {
-                        const reader = await streamResponse(modelId, currentContext, systemPrompt, state.attachments.council);
-                        await processStream(
-                            reader,
-                            (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                            (full) => {
-                                modelResponses[modelId] = full;
-                                updateResponseCard(cardId, full, 'complete');
-                            }
-                        );
-                    } catch (error) {
-                        if (!retry) {
-                            console.log(`Retrying ${modelId} after error: ${error.message}`);
-                            await sleep(2000);
-                            return attemptRequest(true);
+            const attemptRequest = async (retry = false) => {
+                try {
+                    const reader = await streamResponse(modelId, currentContext, systemPrompt, state.attachments.council);
+                    await processStream(
+                        reader,
+                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                        (full) => {
+                            modelResponses[modelId] = full;
+                            updateResponseCard(cardId, full, 'complete');
                         }
-                        updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+                    );
+                } catch (error) {
+                    if (!retry) {
+                        console.log(`Retrying ${modelId} after error: ${error.message}`);
+                        await sleep(2000);
+                        return attemptRequest(true);
                     }
-                };
-                await attemptRequest();
-            });
+                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+                }
+            };
+            await attemptRequest();
+        });
 
-            await Promise.all(roundPromises);
-            finalModelResponses = modelResponses;
+        await Promise.all(roundPromises);
+        finalModelResponses = modelResponses;
 
-            // Conduct synthesis for the round
-            const intermediateSynthesis = await synthesizeCouncil(chairman, originalPrompt, modelResponses, round, state.roundsCount);
-            finalSynthesis = intermediateSynthesis;
+        // Conduct synthesis for the round
+        const intermediateSynthesis = await synthesizeCouncil(chairman, originalPrompt, modelResponses, round, state.roundsCount);
+        finalSynthesis = intermediateSynthesis;
 
-            // If another round follows, update context
-            if (round < state.roundsCount) {
-                currentContext = `Original Question: ${originalPrompt}\n\nPrevious Council Synthesis (Round ${round}):\n${intermediateSynthesis}\n\nTask: Analyze the above synthesis. Identify what's missing, where deeper technical detail is needed, or if there are any subtle risks not yet addressed. Provide a deeper, more refined level of research.`;
-            }
+        // If another round follows, update context
+        if (round < state.roundsCount) {
+            currentContext = `Original Question: ${originalPrompt}\n\nPrevious Council Synthesis (Round ${round}):\n${intermediateSynthesis}\n\nTask: Analyze the above synthesis. Identify what's missing, where deeper technical detail is needed, or if there are any subtle risks not yet addressed. Provide a deeper, more refined level of research.`;
         }
-
-        // After all rounds, conduct Peer Ranking if enabled
-        if (state.peerRankingEnabled) {
-            await conductPeerRanking(originalPrompt, finalModelResponses);
-        }
-
-        saveToHistory('council', originalPrompt, state.selectedCouncilModels.length, null, finalModelResponses, finalSynthesis);
     }
 
+    // After all rounds, conduct Peer Ranking if enabled
+    if (state.peerRankingEnabled) {
+        await conductPeerRanking(originalPrompt, finalModelResponses);
+    }
+
+    saveToHistory('council', originalPrompt, state.selectedCouncilModels.length, null, finalModelResponses, finalSynthesis);
+}
+
 async function synthesizeCouncil(chairmanModel, originalPrompt, responses, round = 1, totalRounds = 1) {
-        const synthesisPanel = document.getElementById('synthesis-panel');
-        const synthesisContent = document.getElementById('synthesis-content');
-        synthesisPanel.classList.remove('hidden');
-        synthesisContent.innerHTML = '<span class="cursor"></span>';
+    const synthesisPanel = document.getElementById('synthesis-panel');
+    const synthesisContent = document.getElementById('synthesis-content');
+    synthesisPanel.classList.remove('hidden');
+    synthesisContent.innerHTML = '<span class="cursor"></span>';
 
-        const responseSummary = Object.entries(responses).map(([modelId, response]) => {
-            const model = findModelById(modelId);
-            return `## ${model.name}'s Analysis:\n${response}`;
-        }).join('\n\n---\n\n');
+    const responseSummary = Object.entries(responses).map(([modelId, response]) => {
+        const model = findModelById(modelId);
+        return `## ${model.name}'s Analysis:\n${response}`;
+    }).join('\n\n---\n\n');
 
-        const isFinalRound = round === totalRounds;
-        const synthesisPrompt = `You are the Chairman of an AI Council. Multiple AI models have analyzed the following question:
+    const isFinalRound = round === totalRounds;
+    const synthesisPrompt = `You are the Chairman of an AI Council. Multiple AI models have analyzed the following question:
 
 **Original Question:** ${originalPrompt}
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
@@ -1454,127 +1536,127 @@ ${isFinalRound ? '4. **Actionable Recommendations** - Clear next steps' : '4. **
 
 Be thorough but organized. Highlight the most valuable insights from each council member.`;
 
-        let synthesisText = '';
-        try {
-            const reader = await streamResponse(chairmanModel, synthesisPrompt);
-            await processStream(
-                reader,
-                (chunk, full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-                },
-                (full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
-                }
-            );
-        } catch (error) {
-            synthesisText = `Error generating synthesis: ${error.message}`;
-            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
-        }
-        return synthesisText;
+    let synthesisText = '';
+    try {
+        const reader = await streamResponse(chairmanModel, synthesisPrompt);
+        await processStream(
+            reader,
+            (chunk, full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+            },
+            (full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full);
+            }
+        );
+    } catch (error) {
+        synthesisText = `Error generating synthesis: ${error.message}`;
+        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
     }
+    return synthesisText;
+}
 
 // ============================================
 // DxO MODE
 // ============================================
 
 async function startDxO(isContinue = false) {
-        const prompt = document.getElementById('dxo-prompt').value.trim();
-        if (!prompt) {
-            alert('Please enter a problem statement or research question.');
-            return;
+    const prompt = document.getElementById('dxo-prompt').value.trim();
+    if (!prompt) {
+        alert('Please enter a problem statement or research question.');
+        return;
+    }
+
+    if (state.roles.length === 0) {
+        alert('Please add at least one role.');
+        return;
+    }
+
+    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('dxo-rounds')?.value || 1);
+    const existingSynthesis = document.getElementById('synthesis-content').textContent;
+
+    if (!isContinue) showResults('DxO Decision Analysis');
+    else document.getElementById('results-panel').classList.remove('hidden');
+
+    let currentContext = isContinue ? existingSynthesis : '';
+    let finalRoleResponses = {};
+    let finalSynthesis = '';
+
+    for (let round = 1; round <= roundsToRun; round++) {
+        const displayRound = isContinue ? 'Continuation' : round;
+        const totalDisplay = isContinue ? 'Continuation' : roundsToRun;
+
+        if (!isContinue && roundsToRun > 1) {
+            document.getElementById('results-title').textContent = `DxO Analysis - Round ${round} of ${roundsToRun}`;
+        } else if (isContinue) {
+            document.getElementById('results-title').textContent = `DxO Analysis - Continuation`;
         }
 
-        if (state.roles.length === 0) {
-            alert('Please add at least one role.');
-            return;
-        }
+        const roleResponses = {};
+        const responsesContainer = document.getElementById('model-responses');
+        if (round === 1) responsesContainer.innerHTML = '';
 
-        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('dxo-rounds')?.value || 1);
-        const existingSynthesis = document.getElementById('synthesis-content').textContent;
+        // Query all roles in parallel
+        const promises = state.roles.map(async (role, index) => {
+            const cardId = `${role.name.replace(/\s+/g, '-')}-round-${round}`;
 
-        if (!isContinue) showResults('DxO Decision Analysis');
-        else document.getElementById('results-panel').classList.remove('hidden');
+            // Create a new card for this round
+            const cardHtml = createResponseCard(role.name, role.perspective, cardId);
+            responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
 
-        let currentContext = isContinue ? existingSynthesis : '';
-        let finalRoleResponses = {};
-        let finalSynthesis = '';
+            if (index > 0) await sleep(index * 1000); // Slight stagger
 
-        for (let round = 1; round <= roundsToRun; round++) {
-            const displayRound = isContinue ? 'Continuation' : round;
-            const totalDisplay = isContinue ? 'Continuation' : roundsToRun;
-
-            if (!isContinue && roundsToRun > 1) {
-                document.getElementById('results-title').textContent = `DxO Analysis - Round ${round} of ${roundsToRun}`;
-            } else if (isContinue) {
-                document.getElementById('results-title').textContent = `DxO Analysis - Continuation`;
-            }
-
-            const roleResponses = {};
-            const responsesContainer = document.getElementById('model-responses');
-            if (round === 1) responsesContainer.innerHTML = '';
-
-            // Query all roles in parallel
-            const promises = state.roles.map(async (role, index) => {
-                const cardId = `${role.name.replace(/\s+/g, '-')}-round-${round}`;
-
-                // Create a new card for this round
-                const cardHtml = createResponseCard(role.name, role.perspective, cardId);
-                responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
-
-                if (index > 0) await sleep(index * 1000); // Slight stagger
-
-                let systemPrompt = `You are acting as the ${role.name} in a multi-perspective analysis team.
+            let systemPrompt = `You are acting as the ${role.name} in a multi-perspective analysis team.
 Your focus: ${role.perspective}
 Your instructions: ${role.instructions}`;
 
-                if (round > 1) {
-                    systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the synthesis above, refine your analysis. Focus on addressing any gaps or debating points identified.`;
-                }
+            if (round > 1) {
+                systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the synthesis above, refine your analysis. Focus on addressing any gaps or debating points identified.`;
+            }
 
-                systemPrompt += `\n\nAnalyze the following problem from your unique perspective. Be thorough but stay focused on your specific role.`;
+            systemPrompt += `\n\nAnalyze the following problem from your unique perspective. Be thorough but stay focused on your specific role.`;
 
-                try {
-                    const reader = await streamResponse(role.model, prompt, systemPrompt, state.attachments.dxo);
-                    await processStream(
-                        reader,
-                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                        (full) => {
-                            roleResponses[role.name] = { response: full, role: role };
-                            updateResponseCard(cardId, full, 'complete');
-                        }
-                    );
-                } catch (error) {
-                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
-                }
-            });
+            try {
+                const reader = await streamResponse(role.model, prompt, systemPrompt, state.attachments.dxo);
+                await processStream(
+                    reader,
+                    (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                    (full) => {
+                        roleResponses[role.name] = { response: full, role: role };
+                        updateResponseCard(cardId, full, 'complete');
+                    }
+                );
+            } catch (error) {
+                updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+            }
+        });
 
-            await Promise.all(promises);
+        await Promise.all(promises);
 
-            finalRoleResponses = { ...finalRoleResponses, ...roleResponses };
-            finalSynthesis = await synthesizeDxO(prompt, roleResponses, round, totalRounds);
-            currentContext = finalSynthesis;
-        }
-
-        // Save to history
-        saveToHistory('dxo', prompt, state.roles.length, state.roles.map(r => r.name), finalRoleResponses, finalSynthesis);
+        finalRoleResponses = { ...finalRoleResponses, ...roleResponses };
+        finalSynthesis = await synthesizeDxO(prompt, roleResponses, round, totalRounds);
+        currentContext = finalSynthesis;
     }
 
+    // Save to history
+    saveToHistory('dxo', prompt, state.roles.length, state.roles.map(r => r.name), finalRoleResponses, finalSynthesis);
+}
+
 async function synthesizeDxO(originalPrompt, responses, round = 1, totalRounds = 1) {
-        const synthesisPanel = document.getElementById('synthesis-panel');
-        const synthesisContent = document.getElementById('synthesis-content');
-        synthesisPanel.classList.remove('hidden');
-        synthesisContent.innerHTML = '<span class="cursor"></span>';
+    const synthesisPanel = document.getElementById('synthesis-panel');
+    const synthesisContent = document.getElementById('synthesis-content');
+    synthesisPanel.classList.remove('hidden');
+    synthesisContent.innerHTML = '<span class="cursor"></span>';
 
-        const responseSummary = Object.entries(responses).map(([roleName, data]) => {
-            return `## ${roleName} (${data.role.perspective}):\n${data.response}`;
-        }).join('\n\n---\n\n');
+    const responseSummary = Object.entries(responses).map(([roleName, data]) => {
+        return `## ${roleName} (${data.role.perspective}):\n${data.response}`;
+    }).join('\n\n---\n\n');
 
-        const isFinalRound = round === totalRounds;
-        const synthesisPrompt = `You are synthesizing a multi-perspective analysis from a DxO Decision Orchestrator session.
+    const isFinalRound = round === totalRounds;
+    const synthesisPrompt = `You are synthesizing a multi-perspective analysis from a DxO Decision Orchestrator session.
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
 
 **Original Problem:** ${originalPrompt}
@@ -1590,121 +1672,121 @@ ${isFinalRound ? '4. **Provides Actionable Recommendations** based on the combin
 
 Be structured and thorough. This synthesis should be more valuable than any single perspective alone.`;
 
-        let synthesisText = '';
-        const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
+    let synthesisText = '';
+    const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
 
-        try {
-            const reader = await streamResponse(chairmanModel, synthesisPrompt);
-            await processStream(
-                reader,
-                (chunk, full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-                },
-                (full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
-                }
-            );
-        } catch (error) {
-            synthesisText = `Error generating synthesis: ${error.message}`;
-            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
-        }
-        return synthesisText;
+    try {
+        const reader = await streamResponse(chairmanModel, synthesisPrompt);
+        await processStream(
+            reader,
+            (chunk, full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+            },
+            (full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full);
+            }
+        );
+    } catch (error) {
+        synthesisText = `Error generating synthesis: ${error.message}`;
+        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
     }
+    return synthesisText;
+}
 
 // ============================================
 // ENSEMBLE MODE
 // ============================================
 
 async function startEnsemble(isContinue = false) {
-        const prompt = document.getElementById('ensemble-prompt').value.trim();
-        if (!prompt) {
-            alert('Please enter a question or topic.');
-            return;
-        }
-
-        if (state.selectedEnsembleModels.length < 2) {
-            alert('Please select at least 2 models for the ensemble.');
-            return;
-        }
-
-        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('ensemble-rounds')?.value || 1);
-        const existingSynthesis = document.getElementById('synthesis-content').textContent;
-
-        if (!isContinue) showResults('Ensemble Analysis');
-        else document.getElementById('results-panel').classList.remove('hidden');
-
-        let currentContext = isContinue ? existingSynthesis : '';
-        let finalAnonymousResponses = {};
-        let finalSynthesis = '';
-
-        for (let round = 1; round <= roundsToRun; round++) {
-            const displayRound = isContinue ? 'Continuation' : round;
-            const roundTitle = !isContinue && roundsToRun > 1 ? ` (Round ${round}/${roundsToRun})` : (isContinue ? ' (Continuation)' : '');
-            document.getElementById('results-title').textContent = `Ensemble${roundTitle}`;
-
-            const anonymousResponses = {};
-            const responsesContainer = document.getElementById('model-responses');
-            if (round === 1) responsesContainer.innerHTML = '';
-
-            // Shuffle models once at the start of the session to keep labels consistent
-            const shuffledModels = [...state.selectedEnsembleModels];
-            if (round === 1) shuffledModels.sort(() => Math.random() - 0.5);
-
-            const promises = shuffledModels.map(async (modelId, index) => {
-                const anonName = ANONYMOUS_NAMES[index] || `Agent ${index + 1}`;
-                const cardId = `${anonName.toLowerCase()}-round-${round}`;
-
-                const cardHtml = createResponseCard(anonName, 'Anonymous Perspective', cardId, anonName.toLowerCase());
-                responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
-
-                if (index > 0) await sleep(index * 1000);
-
-                let systemPrompt = `Provide your analysis and perspective on the following question. Be thorough, insightful, and focused on substance. Your response will be anonymized for unbiased evaluation.`;
-
-                if (round > 1) {
-                    systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the collective synthesis, refine your position or address any specific critiques.`;
-                }
-
-                try {
-                    const reader = await streamResponse(modelId, prompt, systemPrompt, state.attachments.ensemble);
-                    await processStream(
-                        reader,
-                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                        (full) => {
-                            anonymousResponses[anonName] = full;
-                            updateResponseCard(cardId, full, 'complete');
-                        }
-                    );
-                } catch (error) {
-                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
-                }
-            });
-
-            await Promise.all(promises);
-
-            finalAnonymousResponses = { ...finalAnonymousResponses, ...anonymousResponses };
-            finalSynthesis = await synthesizeEnsemble(prompt, anonymousResponses, round, totalRounds);
-            currentContext = finalSynthesis;
-        }
-
-        saveToHistory('ensemble', prompt, state.selectedEnsembleModels.length, null, finalAnonymousResponses, finalSynthesis);
+    const prompt = document.getElementById('ensemble-prompt').value.trim();
+    if (!prompt) {
+        alert('Please enter a question or topic.');
+        return;
     }
 
+    if (state.selectedEnsembleModels.length < 2) {
+        alert('Please select at least 2 models for the ensemble.');
+        return;
+    }
+
+    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('ensemble-rounds')?.value || 1);
+    const existingSynthesis = document.getElementById('synthesis-content').textContent;
+
+    if (!isContinue) showResults('Ensemble Analysis');
+    else document.getElementById('results-panel').classList.remove('hidden');
+
+    let currentContext = isContinue ? existingSynthesis : '';
+    let finalAnonymousResponses = {};
+    let finalSynthesis = '';
+
+    for (let round = 1; round <= roundsToRun; round++) {
+        const displayRound = isContinue ? 'Continuation' : round;
+        const roundTitle = !isContinue && roundsToRun > 1 ? ` (Round ${round}/${roundsToRun})` : (isContinue ? ' (Continuation)' : '');
+        document.getElementById('results-title').textContent = `Ensemble${roundTitle}`;
+
+        const anonymousResponses = {};
+        const responsesContainer = document.getElementById('model-responses');
+        if (round === 1) responsesContainer.innerHTML = '';
+
+        // Shuffle models once at the start of the session to keep labels consistent
+        const shuffledModels = [...state.selectedEnsembleModels];
+        if (round === 1) shuffledModels.sort(() => Math.random() - 0.5);
+
+        const promises = shuffledModels.map(async (modelId, index) => {
+            const anonName = ANONYMOUS_NAMES[index] || `Agent ${index + 1}`;
+            const cardId = `${anonName.toLowerCase()}-round-${round}`;
+
+            const cardHtml = createResponseCard(anonName, 'Anonymous Perspective', cardId, anonName.toLowerCase());
+            responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
+
+            if (index > 0) await sleep(index * 1000);
+
+            let systemPrompt = `Provide your analysis and perspective on the following question. Be thorough, insightful, and focused on substance. Your response will be anonymized for unbiased evaluation.`;
+
+            if (round > 1) {
+                systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the collective synthesis, refine your position or address any specific critiques.`;
+            }
+
+            try {
+                const reader = await streamResponse(modelId, prompt, systemPrompt, state.attachments.ensemble);
+                await processStream(
+                    reader,
+                    (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                    (full) => {
+                        anonymousResponses[anonName] = full;
+                        updateResponseCard(cardId, full, 'complete');
+                    }
+                );
+            } catch (error) {
+                updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+            }
+        });
+
+        await Promise.all(promises);
+
+        finalAnonymousResponses = { ...finalAnonymousResponses, ...anonymousResponses };
+        finalSynthesis = await synthesizeEnsemble(prompt, anonymousResponses, round, totalRounds);
+        currentContext = finalSynthesis;
+    }
+
+    saveToHistory('ensemble', prompt, state.selectedEnsembleModels.length, null, finalAnonymousResponses, finalSynthesis);
+}
+
 async function synthesizeEnsemble(originalPrompt, responses, round = 1, totalRounds = 1) {
-        const synthesisPanel = document.getElementById('synthesis-panel');
-        const synthesisContent = document.getElementById('synthesis-content');
-        synthesisPanel.classList.remove('hidden');
+    const synthesisPanel = document.getElementById('synthesis-panel');
+    const synthesisContent = document.getElementById('synthesis-content');
+    synthesisPanel.classList.remove('hidden');
 
-        const responseSummary = Object.entries(responses).map(([anonName, response]) => {
-            return `## Agent ${anonName}:\n${response}`;
-        }).join('\n\n---\n\n');
+    const responseSummary = Object.entries(responses).map(([anonName, response]) => {
+        return `## Agent ${anonName}:\n${response}`;
+    }).join('\n\n---\n\n');
 
-        const isFinalRound = round === totalRounds;
-        const synthesisPrompt = `You are synthesizing responses from multiple anonymous AI agents. Focus purely on the substance and quality of arguments, not on who said what.
+    const isFinalRound = round === totalRounds;
+    const synthesisPrompt = `You are synthesizing responses from multiple anonymous AI agents. Focus purely on the substance and quality of arguments, not on who said what.
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
 
 **Original Question:** ${originalPrompt}
@@ -1721,74 +1803,74 @@ Create an unbiased ${isFinalRound ? 'FINAL' : 'INTERMEDIATE'} synthesis that:
 
 Remember: Focus on the quality of reasoning, not the source. This is anonymous collective intelligence.`;
 
-        let synthesisText = '';
-        const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
+    let synthesisText = '';
+    const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
 
-        try {
-            const reader = await streamResponse(chairmanModel, synthesisPrompt);
-            await processStream(
-                reader,
-                (chunk, full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-                },
-                (full) => {
-                    synthesisText = full;
-                    const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
-                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
-                }
-            );
-        } catch (error) {
-            synthesisText = `Error generating synthesis: ${error.message}`;
-            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
-        }
-        return synthesisText;
+    try {
+        const reader = await streamResponse(chairmanModel, synthesisPrompt);
+        await processStream(
+            reader,
+            (chunk, full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+            },
+            (full) => {
+                synthesisText = full;
+                const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
+                synthesisContent.innerHTML = roundText + formatMarkdown(full);
+            }
+        );
+    } catch (error) {
+        synthesisText = `Error generating synthesis: ${error.message}`;
+        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
     }
+    return synthesisText;
+}
 
 // ============================================
 // SUPER CHAT MODE
 // ============================================
 
 async function startSuperChat() {
-        const prompt = document.getElementById('superchat-prompt').value.trim();
-        if (!prompt) {
-            alert('Please enter a message.');
-            return;
-        }
-
-        const modelId = document.getElementById('superchat-model').value;
-        const model = findModelById(modelId);
-
-        showResults('Super Chat');
-
-        const responsesContainer = document.getElementById('model-responses');
-        responsesContainer.innerHTML = createResponseCard(model.name, model.provider, 'superchat');
-
-        // Hide synthesis panel for super chat
-        document.getElementById('synthesis-panel').classList.add('hidden');
-
-        try {
-            const reader = await streamResponse(modelId, prompt, '', state.attachments.superchat);
-            await processStream(
-                reader,
-                (chunk, full) => updateResponseCard('superchat', full, 'streaming'),
-                (full) => {
-                    updateResponseCard('superchat', full, 'complete');
-                    saveToHistory('superchat', prompt, 1);
-                }
-            );
-        } catch (error) {
-            updateResponseCard('superchat', `Error: ${error.message}`, 'error');
-        }
+    const prompt = document.getElementById('superchat-prompt').value.trim();
+    if (!prompt) {
+        alert('Please enter a message.');
+        return;
     }
+
+    const modelId = document.getElementById('superchat-model').value;
+    const model = findModelById(modelId);
+
+    showResults('Super Chat');
+
+    const responsesContainer = document.getElementById('model-responses');
+    responsesContainer.innerHTML = createResponseCard(model.name, model.provider, 'superchat');
+
+    // Hide synthesis panel for super chat
+    document.getElementById('synthesis-panel').classList.add('hidden');
+
+    try {
+        const reader = await streamResponse(modelId, prompt, '', state.attachments.superchat);
+        await processStream(
+            reader,
+            (chunk, full) => updateResponseCard('superchat', full, 'streaming'),
+            (full) => {
+                updateResponseCard('superchat', full, 'complete');
+                saveToHistory('superchat', prompt, 1);
+            }
+        );
+    } catch (error) {
+        updateResponseCard('superchat', `Error: ${error.message}`, 'error');
+    }
+}
 
 // ============================================
 // UI HELPERS
 // ============================================
 
 function createResponseCard(name, subtitle, id, avatarClass = '') {
-        return `
+    return `
         <div class="response-card" id="response-${id}">
             <div class="response-header">
                 <div class="response-avatar ${avatarClass}">${name.charAt(0)}</div>
@@ -1803,85 +1885,85 @@ function createResponseCard(name, subtitle, id, avatarClass = '') {
             </div>
         </div>
     `;
-    }
+}
 
 function updateResponseCard(id, content, status) {
-        const contentEl = document.getElementById(`content-${id}`);
-        const statusEl = document.getElementById(`status-${id}`);
+    const contentEl = document.getElementById(`content-${id}`);
+    const statusEl = document.getElementById(`status-${id}`);
 
-        if (contentEl) {
-            if (status === 'streaming') {
-                contentEl.innerHTML = formatMarkdown(content) + '<span class="cursor"></span>';
-            } else {
-                contentEl.innerHTML = formatMarkdown(content);
-            }
-        }
-
-        if (statusEl) {
-            if (status === 'complete') {
-                statusEl.textContent = 'Complete';
-                statusEl.className = 'response-status complete';
-            } else if (status === 'error') {
-                statusEl.textContent = 'Error';
-                statusEl.className = 'response-status error';
-            }
+    if (contentEl) {
+        if (status === 'streaming') {
+            contentEl.innerHTML = formatMarkdown(content) + '<span class="cursor"></span>';
+        } else {
+            contentEl.innerHTML = formatMarkdown(content);
         }
     }
+
+    if (statusEl) {
+        if (status === 'complete') {
+            statusEl.textContent = 'Complete';
+            statusEl.className = 'response-status complete';
+        } else if (status === 'error') {
+            statusEl.textContent = 'Error';
+            statusEl.className = 'response-status error';
+        }
+    }
+}
 
 function formatMarkdown(text) {
-        if (!text) return '';
+    if (!text) return '';
 
-        // Basic markdown formatting
-        let html = text
-            // Headers
-            .replace(/^### (.*$)/gm, '<h4>$1</h4>')
-            .replace(/^## (.*$)/gm, '<h4>$1</h4>')
-            .replace(/^# (.*$)/gm, '<h3>$1</h3>')
-            // Bold
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            // Italic
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            // Code blocks
-            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-            // Inline code
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
-            // Lists
-            .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
-            .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li>$2</li>')
-            // Paragraphs
-            .replace(/\n\n/g, '</p><p>')
-            // Line breaks
-            .replace(/\n/g, '<br>');
+    // Basic markdown formatting
+    let html = text
+        // Headers
+        .replace(/^### (.*$)/gm, '<h4>$1</h4>')
+        .replace(/^## (.*$)/gm, '<h4>$1</h4>')
+        .replace(/^# (.*$)/gm, '<h3>$1</h3>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Code blocks
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Lists
+        .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
+        .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li>$2</li>')
+        // Paragraphs
+        .replace(/\n\n/g, '</p><p>')
+        // Line breaks
+        .replace(/\n/g, '<br>');
 
-        // Wrap in paragraph tags
-        html = '<p>' + html + '</p>';
+    // Wrap in paragraph tags
+    html = '<p>' + html + '</p>';
 
-        // Clean up empty paragraphs
-        html = html.replace(/<p><\/p>/g, '');
+    // Clean up empty paragraphs
+    html = html.replace(/<p><\/p>/g, '');
 
-        // Wrap consecutive li elements in ul
-        html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
+    // Wrap consecutive li elements in ul
+    html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
 
-        return html;
-    }
+    return html;
+}
 
 function showResults(title) {
-        document.getElementById('results-title').textContent = title;
-        document.getElementById('results-panel').classList.remove('hidden');
-        document.getElementById('synthesis-panel').classList.add('hidden');
-        document.getElementById('model-responses').innerHTML = '';
-    }
+    document.getElementById('results-title').textContent = title;
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('synthesis-panel').classList.add('hidden');
+    document.getElementById('model-responses').innerHTML = '';
+}
 
 function closeResults() {
-        document.getElementById('results-panel').classList.add('hidden');
-    }
+    document.getElementById('results-panel').classList.add('hidden');
+}
 
 // Store current results for copy/export
 let currentResults = {
-        title: '',
-        responses: {},
-        synthesis: ''
-    };
+    title: '',
+    responses: {},
+    synthesis: ''
+};
 
 function copyAllResults() {
     const title = document.getElementById('results-title').textContent;
@@ -2237,6 +2319,12 @@ function exportHistoryItem(itemId) {
 
 function showSettings() {
     document.getElementById('settings-modal').classList.remove('hidden');
+}
+
+function logout() {
+    localStorage.removeItem('satya_auth');
+    localStorage.removeItem('satya_api_key');
+    window.location.reload();
 }
 
 function closeSettings() {

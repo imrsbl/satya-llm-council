@@ -474,15 +474,18 @@ async function initUserSession(uid) {
         }
     }
 
-    // Load user-specific API keys from localStorage
-    const userApiKey = localStorage.getItem(`satya_api_key_${uid}`);
-    if (userApiKey) localStorage.setItem('satya_api_key', userApiKey);
-
-    const userNotionKey = localStorage.getItem(`satya_notion_api_key_${uid}`);
-    if (userNotionKey) localStorage.setItem('satya_notion_api_key', userNotionKey);
-
-    const userNotionDb = localStorage.getItem(`satya_notion_db_id_${uid}`);
-    if (userNotionDb) localStorage.setItem('satya_notion_db_id', userNotionDb);
+    // Load config (API Keys) from Firestore
+    try {
+        const savedConfig = await fb.loadUserData(uid, "config");
+        if (savedConfig) {
+            if (savedConfig.apiKey) localStorage.setItem('satya_api_key', savedConfig.apiKey);
+            if (savedConfig.notionKey) localStorage.setItem('satya_notion_api_key', savedConfig.notionKey);
+            if (savedConfig.notionDb) localStorage.setItem('satya_notion_db_id', savedConfig.notionDb);
+            console.log('✅ Loaded API keys from Firestore');
+        }
+    } catch (e) {
+        console.error('Failed to load config from Firestore', e);
+    }
 
     // Refresh settings UI if open
     loadApiKey();
@@ -2828,29 +2831,27 @@ function saveSettings() {
     const apiKey = document.getElementById('api-key-input').value.trim();
     if (apiKey) {
         localStorage.setItem('satya_api_key', apiKey);
-        if (state.currentUser) localStorage.setItem(`satya_api_key_${state.currentUser}`, apiKey);
     } else {
         localStorage.removeItem('satya_api_key');
-        if (state.currentUser) localStorage.removeItem(`satya_api_key_${state.currentUser}`);
     }
 
     const notionKey = document.getElementById('notion-api-key').value.trim();
     const notionDb = document.getElementById('notion-db-id').value.trim();
 
-    if (notionKey) {
-        localStorage.setItem('satya_notion_api_key', notionKey);
-        if (state.currentUser) localStorage.setItem(`satya_notion_api_key_${state.currentUser}`, notionKey);
-    } else {
-        localStorage.removeItem('satya_notion_api_key');
-        if (state.currentUser) localStorage.removeItem(`satya_notion_api_key_${state.currentUser}`);
-    }
+    if (notionKey) localStorage.setItem('satya_notion_api_key', notionKey);
+    else localStorage.removeItem('satya_notion_api_key');
 
-    if (notionDb) {
-        localStorage.setItem('satya_notion_db_id', notionDb);
-        if (state.currentUser) localStorage.setItem(`satya_notion_db_id_${state.currentUser}`, notionDb);
-    } else {
-        localStorage.removeItem('satya_notion_db_id');
-        if (state.currentUser) localStorage.removeItem(`satya_notion_db_id_${state.currentUser}`);
+    if (notionDb) localStorage.setItem('satya_notion_db_id', notionDb);
+    else localStorage.removeItem('satya_notion_db_id');
+
+    // Save to Firestore
+    if (state.currentUser) {
+        fb.saveUserData(state.currentUser, "config", {
+            apiKey,
+            notionKey,
+            notionDb
+        }).then(() => console.log('✅ Config saved to Firestore'))
+            .catch(e => console.error('❌ Failed to save config:', e));
     }
 
     closeSettings();
@@ -3160,3 +3161,18 @@ function addCustomRole(roleData = null) {
     saveCustomRoles();
     renderRoles();
 }
+
+// ============================================
+// EXPOSE TO WINDOW (Required for module type)
+// ============================================
+window.loginWithGoogle = loginWithGoogle;
+window.showLoginModal = showLoginModal;
+window.showRegisterModal = showRegisterModal;
+window.firebaseLogout = firebaseLogout;
+window.showHistory = showHistory;
+window.toggleUltraFreeMode = toggleUltraFreeMode;
+window.showSettings = showSettings;
+window.closeSettings = closeSettings;
+window.closeHistory = closeHistory;
+window.closeResults = closeResults;
+window.sendToNotion = sendToNotion;

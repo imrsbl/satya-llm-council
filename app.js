@@ -3200,3 +3200,5 @@ window.closeSettings = closeSettings;
 window.closeHistory = closeHistory;
 window.closeResults = closeResults;
 window.sendToNotion = sendToNotion;
+window.saveSettings = saveSettings;
+window.toggleMobileMenu = toggleMobileMenu;

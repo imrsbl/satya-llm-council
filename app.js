@@ -2414,38 +2414,45 @@ async function sendToNotion() {
     showCopyFeedback('Sending to Notion...');
 
     // Notion API via CORS Proxy
-    const proxyUrl = 'https://corsproxy.io/?';
+    // corsproxy.io is often blocked. Switching to cors-anywhere.
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const notionUrl = 'https://api.notion.com/v1/pages';
 
     const body = {
         parent: { database_id: databaseId },
         properties: {
-            Name: {
-                title: [{ text: { content: title } }]
-            },
-            Mode: {
-                select: { name: title.split(' ')[0] }
-            },
-            Tags: {
-                multi_select: tags.map(tag => ({ name: tag.trim().replace(/,/g, '') }))
-            },
-            Date: {
-                date: { start: new Date().toISOString() }
-            }
+            Name: { title: [{ text: { content: title } }] },
+            Tags: { multi_select: tags.map(t => ({ name: t })) },
+            Date: { date: { start: new Date().toISOString() } }
         },
-        children: [
-            {
-                object: 'block',
-                type: 'heading_2',
-                heading_2: { rich_text: [{ text: { content: '✨ Final Synthesis' } }] }
-            },
-            {
-                object: 'block',
-                type: 'paragraph',
-                paragraph: { rich_text: [{ text: { content: synthesisContent.substring(0, 2000) } }] }
-            }
-        ]
+        children: []
     };
+
+    // Add notes block
+    if (notes) {
+        body.children.push({
+            object: 'block',
+            type: 'callout',
+            callout: {
+                rich_text: [{ text: { content: `Researcher Notes:\n${notes}` } }],
+                icon: { emoji: '📝' }
+            }
+        });
+    }
+
+    // Add synthesis block
+    if (synthesisContent) {
+        body.children.push({
+            object: 'block',
+            type: 'heading_2',
+            heading_2: { rich_text: [{ text: { content: 'Final Synthesis' } }] }
+        });
+        body.children.push({
+            object: 'block',
+            type: 'paragraph',
+            paragraph: { rich_text: [{ text: { content: synthesisContent.substring(0, 2000) } }] }
+        });
+    }
 
     // Add responses as blocks
     if (responses.length > 0) {
@@ -2469,13 +2476,14 @@ async function sendToNotion() {
         });
     }
 
-    console.log('🌐 Sending request to:', proxyUrl + encodeURIComponent(notionUrl));
+    console.log('🌐 Sending request to:', proxyUrl + notionUrl);
     console.log('📦 Payload size:', JSON.stringify(body).length, 'bytes');
 
     try {
-        const response = await fetch(proxyUrl + encodeURIComponent(notionUrl), {
+        const response = await fetch(proxyUrl + notionUrl, {
             method: 'POST',
             headers: {
+                // 'Origin': window.location.origin, // cors-anywhere sometimes implies origin
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
                 'Notion-Version': '2022-06-28'
@@ -3214,3 +3222,6 @@ window.removeAttachment = removeAttachment;
 window.removeRole = removeRole;
 window.viewHistoryItem = viewHistoryItem;
 window.exportHistoryItem = exportHistoryItem;
+window.startCouncil = startCouncil;
+window.copyAllResults = copyAllResults;
+window.exportCurrentResults = exportCurrentResults;

@@ -59,6 +59,25 @@
             <p id="login-error"
                 style="color: #ef4444; font-size: 12px; margin-top: 12px; display: none; font-family: Inter, sans-serif;">
                 Incorrect password</p>
+
+            <!-- API Key Setup (shows if no key stored) -->
+            <div id="api-key-setup"
+                style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #2a2a35; display: none;">
+                <p style="color: #a0a0b0; font-size: 12px; margin-bottom: 12px; font-family: Inter, sans-serif;">New
+                    device? Enter your OpenRouter API key:</p>
+                <input type="password" id="login-api-key" placeholder="sk-or-v1-..." style="
+                    width: 100%;
+                    padding: 12px 14px;
+                    background: #141418;
+                    border: 1px solid #2a2a35;
+                    border-radius: 10px;
+                    color: #f0f0f5;
+                    font-size: 13px;
+                    font-family: monospace;
+                    outline: none;
+                    box-sizing: border-box;
+                ">
+            </div>
         </div>
     </div>
 
@@ -71,6 +90,11 @@
             document.getElementById('login-overlay').style.display = 'none';
         }
 
+        // Show API key setup if no key stored
+        if (!localStorage.getItem('satya_api_key')) {
+            document.getElementById('api-key-setup').style.display = 'block';
+        }
+
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             const data = encoder.encode(password);
@@ -81,11 +105,18 @@
 
         async function attemptLogin() {
             const password = document.getElementById('login-password').value;
+            const apiKeyInput = document.getElementById('login-api-key');
             const hash = await hashPassword(password);
 
             // Simple password check - change this to your password
             if (password === 'satya2026') {
                 localStorage.setItem('satya_auth', hash);
+
+                // Save API key if provided
+                if (apiKeyInput && apiKeyInput.value.trim()) {
+                    localStorage.setItem('satya_api_key', apiKeyInput.value.trim());
+                }
+
                 document.getElementById('login-overlay').style.display = 'none';
             } else {
                 document.getElementById('login-error').style.display = 'block';

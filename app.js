@@ -539,7 +539,6 @@ async function persistSettings() {
 }
 
 // Listen for auth state changes
-// Listen for auth state changes
 fb.onAuthStateChanged(fb.auth, async (user) => {
     const overlay = document.getElementById('login-overlay');
     if (user) {
@@ -549,13 +548,17 @@ fb.onAuthStateChanged(fb.auth, async (user) => {
             await initUserSession(user.uid);
         } catch (err) {
             console.error('⚠️ Data Sync Error:', err);
-            // Don't block UI update on data sync error
         }
         updateAuthUI(true, user.email);
     } else {
         console.log('🔓 User not authenticated');
         state.currentUser = null;
-        if (overlay) overlay.style.display = 'flex';
+        // Delay showing login overlay to prevent flash on page load
+        setTimeout(() => {
+            if (!state.currentUser && overlay) {
+                overlay.style.display = 'flex';
+            }
+        }, 300);
         updateAuthUI(false);
     }
 });
@@ -3264,3 +3267,137 @@ window.saveSessionMeta = saveSessionMeta;
 window.continueResearch = continueResearch;
 window.renderLeaderboard = renderLeaderboard;
 window.switchTab = switchTab;
+
+// ============================================
+// PROFILE PANEL FUNCTIONS
+// ============================================
+
+function toggleProfilePanel() {
+    const panel = document.getElementById('profile-panel');
+    if (!panel) return;
+    
+    panel.classList.toggle('hidden');
+    
+    // If opening, populate with current data
+    if (!panel.classList.contains('hidden')) {
+        populateProfilePanel();
+    }
+}
+
+function populateProfilePanel() {
+    const emailDisplay = document.getElementById('profile-email-display');
+    const nameInput = document.getElementById('profile-display-name');
+    const photoInitial = document.getElementById('profile-photo-initial');
+    const photoEl = document.getElementById('profile-photo');
+    const apiKeyInput = document.getElementById('profile-api-key');
+    const notionKeyInput = document.getElementById('profile-notion-key');
+    const notionDbInput = document.getElementById('profile-notion-db');
+    
+    // Populate email
+    if (emailDisplay && state.userEmail) {
+        emailDisplay.textContent = state.userEmail;
+    }
+    
+    // Populate photo initial
+    if (photoInitial && state.userEmail) {
+        photoInitial.textContent = state.userEmail.charAt(0).toUpperCase();
+    }
+    
+    // Populate name from state or localStorage
+    const savedName = localStorage.getItem('satya_display_name');
+    if (nameInput && savedName) {
+        nameInput.value = savedName;
+    }
+    
+    // Populate saved photo
+    const savedPhoto = localStorage.getItem('satya_profile_photo');
+    if (savedPhoto && photoEl) {
+        photoEl.innerHTML = `<img src="${savedPhoto}" alt="Profile">`;
+    }
+    
+    // Populate API keys
+    if (apiKeyInput) apiKeyInput.value = localStorage.getItem('satya_api_key') || '';
+    if (notionKeyInput) notionKeyInput.value = localStorage.getItem('satya_notion_api_key') || '';
+    if (notionDbInput) notionDbInput.value = localStorage.getItem('satya_notion_db_id') || '';
+}
+
+function triggerPhotoUpload() {
+    document.getElementById('photo-upload')?.click();
+}
+
+function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Limit file size to 500KB
+    if (file.size > 500 * 1024) {
+        alert('Photo must be less than 500KB');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        
+        // Update UI
+        const photoEl = document.getElementById('profile-photo');
+        if (photoEl) {
+            photoEl.innerHTML = `<img src="${dataUrl}" alt="Profile">`;
+        }
+        
+        // Update header avatar
+        const headerAvatar = document.getElementById('profile-avatar');
+        if (headerAvatar) {
+            headerAvatar.innerHTML = `<img src="${dataUrl}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('satya_profile_photo', dataUrl);
+    };
+    reader.readAsDataURL(file);
+}
+
+function saveProfileSettings() {
+    const nameInput = document.getElementById('profile-display-name');
+    const apiKeyInput = document.getElementById('profile-api-key');
+    const notionKeyInput = document.getElementById('profile-notion-key');
+    const notionDbInput = document.getElementById('profile-notion-db');
+    
+    // Save display name
+    if (nameInput && nameInput.value.trim()) {
+        localStorage.setItem('satya_display_name', nameInput.value.trim());
+    }
+    
+    // Save API keys
+    const apiKey = apiKeyInput?.value.trim() || '';
+    const notionKey = notionKeyInput?.value.trim() || '';
+    const notionDb = notionDbInput?.value.trim() || '';
+    
+    if (apiKey) localStorage.setItem('satya_api_key', apiKey);
+    else localStorage.removeItem('satya_api_key');
+    
+    if (notionKey) localStorage.setItem('satya_notion_api_key', notionKey);
+    else localStorage.removeItem('satya_notion_api_key');
+    
+    if (notionDb) localStorage.setItem('satya_notion_db_id', notionDb);
+    else localStorage.removeItem('satya_notion_db_id');
+    
+    // Also save to Firestore if logged in
+    if (state.currentUser) {
+        fb.saveUserData(state.currentUser, "config", {
+            apiKey,
+            notionKey,
+            notionDb,
+            displayName: nameInput?.value.trim() || ''
+        }).then(() => console.log('✅ Profile saved to cloud'))
+          .catch(e => console.error('❌ Cloud save failed:', e));
+    }
+    
+    showCopyFeedback('Settings saved!');
+}
+
+// Expose new functions
+window.toggleProfilePanel = toggleProfilePanel;
+window.triggerPhotoUpload = triggerPhotoUpload;
+window.handlePhotoUpload = handlePhotoUpload;
+window.saveProfileSettings = saveProfileSettings;

@@ -32,7 +32,8 @@
             </p>
 
             <!-- Google Login Button -->
-            <button id="overlay-google-login-btn" onclick="loginWithGoogle()" style="
+            <!-- Note: Event listener is attached in app.js for robustness -->
+            <button id="overlay-google-login-btn" style="
                 width: 100%; padding: 12px 20px; background: #fff; border: none;
                 border-radius: 24px; color: #3c4043; font-size: 15px; font-weight: 500;
                 font-family: 'Roboto', sans-serif; cursor: pointer;
@@ -994,6 +995,14 @@
         </div>
     </main>
 
+    <script>
+        window.onerror = function (msg, url, line) {
+            console.error('Global Error:', msg, url, line);
+            if (String(msg).includes('import') || String(msg).includes('firebase') || String(msg).includes('module')) {
+                alert('⚠️ System Error: Failed to load application modules.\n\nPossible causes:\n1. Ad-blocker blocking Google/Firebase\n2. Network firewall\n3. Weak internet connection\n\nPlease check console for details.');
+            }
+        };
+    </script>
     <script type="module" src="app.js"></script>
 </body>
 

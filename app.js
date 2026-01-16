@@ -406,6 +406,17 @@ async function showLoginModal() {
     }
 }
 
+// Attach event listener when DOM is ready (more robust than onclick)
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('overlay-google-login-btn');
+    if (btn) {
+        btn.addEventListener('click', loginWithGoogle);
+        console.log('✅ Google Login listener attached');
+    } else {
+        console.warn('⚠️ Google Login button not found');
+    }
+});
+
 async function loginWithGoogle() {
     try {
         const cred = await fb.loginWithGoogle();

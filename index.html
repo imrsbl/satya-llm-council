@@ -842,10 +842,15 @@
                     <button class="close-btn" onclick="closeHistory()">×</button>
                 </div>
                 <div class="history-actions">
-                    <button class="action-chip purple">+ Super Chat</button>
-                    <button class="action-chip purple">+ Council</button>
-                    <button class="action-chip pink">+ DxO</button>
-                    <button class="action-chip green">+ Ensemble</button>
+                    <button class="action-chip purple" onclick="filterHistory('superchat')" data-mode="superchat">+
+                        Super Chat</button>
+                    <button class="action-chip purple" onclick="filterHistory('council')" data-mode="council">+
+                        Council</button>
+                    <button class="action-chip pink" onclick="filterHistory('dxo')" data-mode="dxo">+ DxO</button>
+                    <button class="action-chip green" onclick="filterHistory('ensemble')" data-mode="ensemble">+
+                        Ensemble</button>
+                    <button class="action-chip" onclick="filterHistory(null)"
+                        style="background: rgba(255,255,255,0.1);">Show All</button>
                 </div>
                 <div class="history-stats">
                     <div class="stat-box">

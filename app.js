@@ -1018,19 +1018,83 @@ function savePreset(mode) {
 }
 
 function continueSession() {
-    // This allows manually running another round regardless of the slider
+    // This allows manually running another round or continuing after an error
     const resultsPanel = document.getElementById('results-panel');
     if (resultsPanel.classList.contains('hidden')) return;
 
+    // Get synthesis content for context (even if it's an error message)
+    const synthesisContent = document.getElementById('synthesis-content');
+    const synthesisText = synthesisContent ? synthesisContent.innerText : '';
+
     const resultsTitle = document.getElementById('results-title').textContent;
-    if (resultsTitle.includes('Council')) {
-        // Council continue logic
-        // We increment the slider or just run one more round
-        startCouncil(true); // pass true to indicate it's a 'continue' action
-    } else if (resultsTitle.includes('DxO')) {
-        startDxO(true);
-    } else if (resultsTitle.includes('Ensemble')) {
-        startEnsemble(true);
+
+    // Store context for continuation
+    const mode = resultsTitle.toLowerCase().includes('council') ? 'council' :
+        resultsTitle.toLowerCase().includes('dxo') ? 'dxo' :
+            resultsTitle.toLowerCase().includes('ensemble') ? 'ensemble' : 'superchat';
+
+    // Collect current responses from DOM
+    const responseCards = document.querySelectorAll('#model-responses .response-card');
+    const currentResponses = {};
+    responseCards.forEach(card => {
+        const header = card.querySelector('.response-header h3, .response-header h4');
+        const body = card.querySelector('.response-body, .response-content');
+        if (header && body) {
+            currentResponses[header.textContent] = body.innerText;
+        }
+    });
+
+    // Store session context for follow-up
+    lastSessionContext = {
+        mode: mode,
+        prompt: document.getElementById(`${mode}-prompt`)?.value || '',
+        responses: currentResponses,
+        synthesisText: synthesisText,
+        timestamp: new Date().toISOString()
+    };
+
+    // Prompt user for follow-up question
+    const continuePrompt = prompt('Enter follow-up question or leave empty to retry synthesis:');
+
+    if (continuePrompt === null) return; // User cancelled
+
+    if (continuePrompt.trim() === '') {
+        // Retry synthesis only
+        if (mode === 'council') {
+            startCouncil(true);
+        } else if (mode === 'dxo') {
+            startDxO(true);
+        } else if (mode === 'ensemble') {
+            startEnsemble(true);
+        }
+    } else {
+        // Follow-up question with context
+        const basePrompt = document.getElementById(`${mode}-prompt`)?.value || '';
+
+        const contextBuilder = Object.entries(currentResponses).map(([name, content]) =>
+            `**${name}**: ${content.substring(0, 500)}...`
+        ).join('\n\n');
+
+        const fullPrompt = `Previous research context:
+${contextBuilder}
+
+${synthesisText ? `Previous synthesis:\n${synthesisText.substring(0, 1000)}...\n\n` : ''}---
+
+Follow-up question: ${continuePrompt}
+
+Please continue the analysis, building on the previous insights.`;
+
+        // Set prompt and run
+        if (mode === 'council') {
+            document.getElementById('council-prompt').value = fullPrompt;
+            startCouncil();
+        } else if (mode === 'dxo') {
+            document.getElementById('dxo-prompt').value = fullPrompt;
+            startDxO();
+        } else if (mode === 'ensemble') {
+            document.getElementById('ensemble-prompt').value = fullPrompt;
+            startEnsemble();
+        }
     }
 }
 
@@ -1832,19 +1896,66 @@ function updateResponseCard(id, content, status) {
 function autoFillMetadata(synthesisText) {
     if (!synthesisText) return;
 
-    // Extract Tags
-    const tagsMatch = synthesisText.match(/TAGS:\s*\[?([^\]\n]+)\]?/i);
-    if (tagsMatch && tagsMatch[1]) {
-        const tagsInput = document.getElementById('session-tags');
-        if (tagsInput) tagsInput.value = tagsMatch[1].trim().replace(/[\[\]]/g, '');
+    const tagsInput = document.getElementById('session-tags');
+    const notesInput = document.getElementById('session-notes');
+
+    // Try explicit TAGS format first
+    let tagsMatch = synthesisText.match(/TAGS:\\s*\\[?([^\\]\\n]+)\\]?/i);
+    if (tagsMatch && tagsMatch[1] && tagsInput) {
+        tagsInput.value = tagsMatch[1].trim().replace(/[\\[\\]]/g, '');
+    } else if (tagsInput && !tagsInput.value) {
+        // Auto-generate tags from key terms in the synthesis
+        const keyTerms = extractKeyTerms(synthesisText);
+        if (keyTerms.length > 0) {
+            tagsInput.value = keyTerms.slice(0, 5).join(', ');
+        }
     }
 
-    // Extract Summary/Notes
-    const summaryMatch = synthesisText.match(/SUMMARY:\s*\[?([^\]\n]+)\]?/i);
-    if (summaryMatch && summaryMatch[1]) {
-        const notesInput = document.getElementById('session-notes');
-        if (notesInput) notesInput.value = summaryMatch[1].trim().replace(/[\[\]]/g, '');
+    // Try explicit SUMMARY format first
+    let summaryMatch = synthesisText.match(/SUMMARY:\\s*\\[?([^\\]\\n]+)\\]?/i);
+    if (summaryMatch && summaryMatch[1] && notesInput) {
+        notesInput.value = summaryMatch[1].trim().replace(/[\\[\\]]/g, '');
+    } else if (notesInput && !notesInput.value) {
+        // Auto-generate a brief summary from synthesis
+        const firstSentences = synthesisText.split(/[.!?]/).slice(0, 2).join('. ').trim();
+        if (firstSentences) {
+            notesInput.value = firstSentences.substring(0, 200) + (firstSentences.length > 200 ? '...' : '');
+        }
     }
+}
+
+function extractKeyTerms(text) {
+    // Common stop words to filter out
+    const stopWords = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+        'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might',
+        'and', 'or', 'but', 'if', 'then', 'else', 'when', 'at', 'by', 'for', 'with', 'about', 'against',
+        'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up',
+        'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'once', 'here', 'there',
+        'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+        'same', 'so', 'than', 'too', 'very', 'just', 'can', 'this', 'that', 'these', 'those', 'it', 'its']);
+
+    // Extract capitalized terms and technical words
+    const words = text.match(/\\b[A-Z][a-zA-Z0-9]+\\b/g) || [];
+    const uniqueTerms = [...new Set(words)]
+        .filter(word => word.length > 3 && !stopWords.has(word.toLowerCase()))
+        .slice(0, 10);
+
+    // Also extract terms that appear multiple times
+    const wordCounts = {};
+    const allWords = text.toLowerCase().match(/\\b[a-z]{4,}\\b/g) || [];
+    allWords.forEach(word => {
+        if (!stopWords.has(word)) {
+            wordCounts[word] = (wordCounts[word] || 0) + 1;
+        }
+    });
+
+    const frequentTerms = Object.entries(wordCounts)
+        .filter(([word, count]) => count >= 3)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([word]) => word);
+
+    return [...new Set([...uniqueTerms, ...frequentTerms])].slice(0, 5);
 }
 
 function formatMarkdown(text) {
@@ -1989,13 +2100,16 @@ async function sendToNotion() {
     // Get synthesis
     const synthesisContent = document.getElementById('synthesis-content').innerText;
 
-    // Get responses
+    // Get responses - use flexible selectors to handle different card structures
     const responseCards = document.querySelectorAll('#model-responses .response-card');
     const responses = Array.from(responseCards).map(card => {
-        const name = card.querySelector('.response-header h4')?.textContent || 'Agent';
-        const content = card.querySelector('.response-content')?.innerText || '';
-        return { name, content };
-    });
+        const name = card.querySelector('.response-header h3')?.textContent ||
+            card.querySelector('.response-header h4')?.textContent ||
+            card.querySelector('.response-header')?.textContent?.trim() || 'Agent';
+        const content = card.querySelector('.response-body')?.innerText ||
+            card.querySelector('.response-content')?.innerText || '';
+        return { name: name.trim(), content: content.trim() };
+    }).filter(r => r.content.length > 0);
 
     showCopyFeedback('Sending to Notion...');
 
@@ -2198,14 +2312,40 @@ function updateHistoryStats() {
     document.getElementById('stat-ensemble').textContent = counts.ensemble;
 }
 
+// History filter state
+let historyFilterMode = null;
+
+function filterHistory(mode) {
+    historyFilterMode = mode;
+
+    // Update button active states
+    document.querySelectorAll('.history-actions .action-chip').forEach(btn => {
+        const btnMode = btn.dataset.mode;
+        if (mode === null) {
+            btn.classList.remove('active');
+            if (btn.textContent === 'Show All') btn.classList.add('active');
+        } else {
+            btn.classList.toggle('active', btnMode === mode);
+        }
+    });
+
+    renderHistory();
+}
+
 function renderHistory() {
     const container = document.getElementById('history-list');
 
+    // Apply mode filter
+    let filteredHistory = state.history;
+    if (historyFilterMode) {
+        filteredHistory = state.history.filter(h => h.type === historyFilterMode);
+    }
+
     const groupedHistory = {
-        council: state.history.filter(h => h.type === 'council'),
-        dxo: state.history.filter(h => h.type === 'dxo'),
-        ensemble: state.history.filter(h => h.type === 'ensemble'),
-        superchat: state.history.filter(h => h.type === 'superchat')
+        council: filteredHistory.filter(h => h.type === 'council'),
+        dxo: filteredHistory.filter(h => h.type === 'dxo'),
+        ensemble: filteredHistory.filter(h => h.type === 'ensemble'),
+        superchat: filteredHistory.filter(h => h.type === 'superchat')
     };
 
     let html = '';
@@ -2247,7 +2387,8 @@ function renderHistory() {
     }
 
     if (html === '') {
-        html = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">No history yet. Start a research session to see it here.</p>';
+        const modeText = historyFilterMode ? ` for ${historyFilterMode.charAt(0).toUpperCase() + historyFilterMode.slice(1)}` : '';
+        html = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">No history${modeText} yet. Start a research session to see it here.</p>`;
     }
 
     container.innerHTML = html;
@@ -2570,41 +2711,7 @@ async function startBenchmark() {
     }
 }
 
-// ============================================
-// CONTINUE SESSION
-// ============================================
-
-function continueSession() {
-    if (!lastSessionContext) {
-        alert('No previous session context available.');
-        return;
-    }
-
-    const continuePrompt = prompt('Enter follow-up question or request:');
-    if (!continuePrompt || continuePrompt.trim() === '') return;
-
-    // Combine previous context with new prompt
-    const fullPrompt = `Previous discussion summary:
-${lastSessionContext.synthesisText}
-
----
-
-Follow-up question: ${continuePrompt}
-
-Please continue the analysis, building on the insights from the previous discussion.`;
-
-    // Re-run with context
-    if (lastSessionContext.mode === 'council') {
-        document.getElementById('council-prompt').value = fullPrompt;
-        startCouncil();
-    } else if (lastSessionContext.mode === 'ensemble') {
-        document.getElementById('ensemble-prompt').value = fullPrompt;
-        startEnsemble();
-    } else if (lastSessionContext.mode === 'dxo') {
-        document.getElementById('dxo-prompt').value = fullPrompt;
-        startDxO();
-    }
-}
+// continueSession is defined above (around line 1020) with full context handling
 
 // Store session context after each run
 function storeSessionContext(mode, prompt, responses, synthesisText) {

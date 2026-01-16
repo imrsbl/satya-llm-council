@@ -3279,3 +3279,54 @@ body {
         max-width: 100% !important;
     }
 }
+
+/* ========================================
+   INSTAGRAM-STYLE LOGO
+   ======================================== */
+.satya-brand {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.satya-brand:hover {
+    transform: scale(1.02);
+}
+
+.satya-gradient {
+    background: linear-gradient(135deg, #00ddb3 0%, #7c3aed 50%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+}
+
+/* ========================================
+   COLORFUL TAB ICONS
+   ======================================== */
+.nav-tab[data-tab="superchat"] .mode-icon { stroke: #00ddb3; }
+.nav-tab[data-tab="superchat"].active { color: #00ddb3; border-bottom-color: #00ddb3; }
+
+.nav-tab[data-tab="council"] .mode-icon { stroke: #7c3aed; }
+.nav-tab[data-tab="council"].active { color: #7c3aed; border-bottom-color: #7c3aed; }
+
+.nav-tab[data-tab="dxo"] .mode-icon { stroke: #ec4899; }
+.nav-tab[data-tab="dxo"].active { color: #ec4899; border-bottom-color: #ec4899; }
+
+.nav-tab[data-tab="ensemble"] .mode-icon { stroke: #f59e0b; }
+.nav-tab[data-tab="ensemble"].active { color: #f59e0b; border-bottom-color: #f59e0b; }
+
+.nav-tab[data-tab="benchmarks"] .mode-icon { stroke: #3b82f6; }
+.nav-tab[data-tab="benchmarks"].active { color: #3b82f6; border-bottom-color: #3b82f6; }
+
+.nav-tab[data-tab="leaderboard"] .mode-icon { stroke: #22c55e; }
+.nav-tab[data-tab="leaderboard"].active { color: #22c55e; border-bottom-color: #22c55e; }
+
+.nav-tab[data-tab="history"] .mode-icon { stroke: #a78bfa; }
+.nav-tab[data-tab="history"].active { color: #a78bfa; border-bottom-color: #a78bfa; }
+
+/* Make active tabs brighter */
+.nav-tab.active .mode-icon {
+    stroke-width: 2.5;
+}

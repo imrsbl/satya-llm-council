@@ -2484,19 +2484,26 @@ async function sendToNotion() {
         });
     }
 
-    console.log('🌐 Sending request to:', proxyUrl + encodeURIComponent(notionUrl));
+    console.log('🌐 Sending request via Firebase Cloud Function');
     console.log('📦 Payload size:', JSON.stringify(body).length, 'bytes');
 
+    // Use Firebase Cloud Function as proxy (more reliable than third-party CORS proxies)
+    // If Cloud Function is deployed, use it. Otherwise fall back to corsproxy.io
+    const cloudFunctionUrl = 'https://us-central1-satya-468b9.cloudfunctions.net/notionProxy';
+    const fallbackProxyUrl = 'https://corsproxy.io/?';
+
     try {
-        const response = await fetch(proxyUrl + encodeURIComponent(notionUrl), {
+        // Try Firebase Cloud Function first
+        const response = await fetch(cloudFunctionUrl, {
             method: 'POST',
             headers: {
-                // 'Origin': window.location.origin, // cors-anywhere sometimes implies origin
-                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
-                'Notion-Version': '2022-06-28'
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify({
+                url: 'https://api.notion.com/v1/pages',
+                method: 'POST',
+                body: body
+            })
         });
 
         console.log('📡 Response status:', response.status, response.statusText);
@@ -3275,9 +3282,9 @@ window.switchTab = switchTab;
 function toggleProfilePanel() {
     const panel = document.getElementById('profile-panel');
     if (!panel) return;
-    
+
     panel.classList.toggle('hidden');
-    
+
     // If opening, populate with current data
     if (!panel.classList.contains('hidden')) {
         populateProfilePanel();
@@ -3292,29 +3299,29 @@ function populateProfilePanel() {
     const apiKeyInput = document.getElementById('profile-api-key');
     const notionKeyInput = document.getElementById('profile-notion-key');
     const notionDbInput = document.getElementById('profile-notion-db');
-    
+
     // Populate email
     if (emailDisplay && state.userEmail) {
         emailDisplay.textContent = state.userEmail;
     }
-    
+
     // Populate photo initial
     if (photoInitial && state.userEmail) {
         photoInitial.textContent = state.userEmail.charAt(0).toUpperCase();
     }
-    
+
     // Populate name from state or localStorage
     const savedName = localStorage.getItem('satya_display_name');
     if (nameInput && savedName) {
         nameInput.value = savedName;
     }
-    
+
     // Populate saved photo
     const savedPhoto = localStorage.getItem('satya_profile_photo');
     if (savedPhoto && photoEl) {
         photoEl.innerHTML = `<img src="${savedPhoto}" alt="Profile">`;
     }
-    
+
     // Populate API keys
     if (apiKeyInput) apiKeyInput.value = localStorage.getItem('satya_api_key') || '';
     if (notionKeyInput) notionKeyInput.value = localStorage.getItem('satya_notion_api_key') || '';
@@ -3328,29 +3335,29 @@ function triggerPhotoUpload() {
 function handlePhotoUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Limit file size to 500KB
     if (file.size > 500 * 1024) {
         alert('Photo must be less than 500KB');
         return;
     }
-    
+
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const dataUrl = e.target.result;
-        
+
         // Update UI
         const photoEl = document.getElementById('profile-photo');
         if (photoEl) {
             photoEl.innerHTML = `<img src="${dataUrl}" alt="Profile">`;
         }
-        
+
         // Update header avatar
         const headerAvatar = document.getElementById('profile-avatar');
         if (headerAvatar) {
             headerAvatar.innerHTML = `<img src="${dataUrl}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
         }
-        
+
         // Save to localStorage
         localStorage.setItem('satya_profile_photo', dataUrl);
     };
@@ -3362,26 +3369,26 @@ function saveProfileSettings() {
     const apiKeyInput = document.getElementById('profile-api-key');
     const notionKeyInput = document.getElementById('profile-notion-key');
     const notionDbInput = document.getElementById('profile-notion-db');
-    
+
     // Save display name
     if (nameInput && nameInput.value.trim()) {
         localStorage.setItem('satya_display_name', nameInput.value.trim());
     }
-    
+
     // Save API keys
     const apiKey = apiKeyInput?.value.trim() || '';
     const notionKey = notionKeyInput?.value.trim() || '';
     const notionDb = notionDbInput?.value.trim() || '';
-    
+
     if (apiKey) localStorage.setItem('satya_api_key', apiKey);
     else localStorage.removeItem('satya_api_key');
-    
+
     if (notionKey) localStorage.setItem('satya_notion_api_key', notionKey);
     else localStorage.removeItem('satya_notion_api_key');
-    
+
     if (notionDb) localStorage.setItem('satya_notion_db_id', notionDb);
     else localStorage.removeItem('satya_notion_db_id');
-    
+
     // Also save to Firestore if logged in
     if (state.currentUser) {
         fb.saveUserData(state.currentUser, "config", {
@@ -3390,9 +3397,9 @@ function saveProfileSettings() {
             notionDb,
             displayName: nameInput?.value.trim() || ''
         }).then(() => console.log('✅ Profile saved to cloud'))
-          .catch(e => console.error('❌ Cloud save failed:', e));
+            .catch(e => console.error('❌ Cloud save failed:', e));
     }
-    
+
     showCopyFeedback('Settings saved!');
 }
 
@@ -3412,17 +3419,17 @@ document.addEventListener('DOMContentLoaded', () => {
         profileAvatar.addEventListener('click', toggleProfilePanel);
         console.log('✅ Profile avatar click attached');
     }
-    
+
     // Results panel buttons
     setTimeout(() => {
         const continueBtn = document.querySelector('[onclick*="continueSession"]');
         const copyBtn = document.querySelector('[onclick*="copyAllResults"]');
         const exportBtn = document.querySelector('[onclick*="exportCurrentResults"]');
-        
+
         if (continueBtn) continueBtn.onclick = continueSession;
         if (copyBtn) copyBtn.onclick = copyAllResults;
         if (exportBtn) exportBtn.onclick = exportCurrentResults;
-        
+
         console.log('✅ Results buttons patched');
     }, 1000);
 });
@@ -3438,20 +3445,20 @@ function autoPopulateSessionMeta() {
     const synthesisContent = document.getElementById('synthesis-content')?.innerText || '';
     const tagsInput = document.getElementById('session-tags');
     const notesInput = document.getElementById('session-notes');
-    
+
     if (!synthesisContent) return;
-    
+
     // Extract key themes as tags (first 3-5 significant words)
     const words = synthesisContent.split(/\s+/).filter(w => w.length > 5);
     const uniqueWords = [...new Set(words)].slice(0, 5);
     const suggestedTags = uniqueWords.join(', ');
-    
+
     // Generate a summary note
     const firstSentence = synthesisContent.split('.')[0]?.trim() || '';
-    const summaryNote = firstSentence.length > 200 
-        ? firstSentence.substring(0, 200) + '...' 
+    const summaryNote = firstSentence.length > 200
+        ? firstSentence.substring(0, 200) + '...'
         : firstSentence;
-    
+
     // Populate if fields are empty
     if (tagsInput && !tagsInput.value.trim()) {
         tagsInput.value = suggestedTags;
@@ -3459,14 +3466,14 @@ function autoPopulateSessionMeta() {
     if (notesInput && !notesInput.value.trim()) {
         notesInput.value = `Key Finding: ${summaryNote}`;
     }
-    
+
     console.log('✅ Session metadata auto-populated');
 }
 
 // Call autoPopulate after synthesis is complete
 // Hook into the synthesis completion flow
 const originalShowCopyFeedback = showCopyFeedback;
-window.showCopyFeedback = function(msg) {
+window.showCopyFeedback = function (msg) {
     originalShowCopyFeedback(msg);
     // Auto-populate after a short delay when results are shown
     if (msg.includes('Success') || msg.includes('Complete')) {

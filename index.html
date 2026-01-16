@@ -72,9 +72,10 @@
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <div class="logo">
+            <!-- Instagram-style Logo -->
+            <div class="logo satya-brand" onclick="switchTab('council')">
                 <img src="logo.png" class="logo-img">
-                <span class="logo-text">Satya</span>
+                <span class="logo-text satya-gradient">Satya</span>
             </div>
             <nav class="nav-tabs">
                 <button class="nav-tab" data-tab="superchat">
@@ -135,6 +136,14 @@
                         <path d="M6 20v-4"></path>
                     </svg>
                     Leaderboard
+                </button>
+                <button class="nav-tab" data-tab="history" onclick="showHistory()">
+                    <svg class="mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12,6 12,12 16,14"></polyline>
+                    </svg>
+                    History
                 </button>
             </nav>
         </div>

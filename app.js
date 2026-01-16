@@ -4,6 +4,11 @@
    ============================================ */
 
 // ============================================
+// FIREBASE INTEGRATION
+// ============================================
+import * as fb from "./firebase.js";
+
+// ============================================
 // CONFIGURATION
 // ============================================
 
@@ -266,7 +271,9 @@ let state = {
     peerRankingEnabled: true,
     currentSessionId: null,
     showAllModels: false,
-    showAllModelsEnsemble: false
+    showAllModelsEnsemble: false,
+    // Firebase auth
+    currentUser: null
 };
 
 
@@ -380,6 +387,132 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     setupFullscreenReader();
 });
+
+// ============================================
+// FIREBASE AUTHENTICATION
+// ============================================
+
+async function showLoginModal() {
+    const email = prompt('📧 Email:');
+    const password = prompt('🔐 Password:');
+    if (email && password) {
+        try {
+            const cred = await fb.login(email, password);
+            alert(`✅ Logged in as ${cred.user.email}`);
+            await initUserSession(cred.user.uid);
+        } catch (err) {
+            alert('❌ Login failed: ' + err.message);
+        }
+    }
+}
+
+async function showRegisterModal() {
+    const email = prompt('📧 New Email:');
+    const password = prompt('🔐 New Password (min 6 characters):');
+    if (email && password) {
+        try {
+            const cred = await fb.register(email, password);
+            alert(`✅ Account created! You are now logged in as ${cred.user.email}`);
+            await initUserSession(cred.user.uid);
+        } catch (err) {
+            alert('❌ Registration failed: ' + err.message);
+        }
+    }
+}
+
+async function firebaseLogout() {
+    try {
+        await fb.logout();
+        alert('👋 Logged out successfully');
+        state.currentUser = null;
+        location.reload();
+    } catch (err) {
+        alert('❌ Logout failed: ' + err.message);
+    }
+}
+
+// Load user-specific data after auth
+async function initUserSession(uid) {
+    state.currentUser = uid;
+
+    // Load saved history
+    const savedHistory = await fb.loadUserData(uid, "history");
+    if (Array.isArray(savedHistory)) {
+        state.history = savedHistory;
+        renderHistory();
+        updateHistoryStats();
+    }
+
+    // Load saved settings
+    const savedSettings = await fb.loadUserData(uid, "settings");
+    if (savedSettings) {
+        if (savedSettings.ultraFreeMode !== undefined) {
+            state.ultraFreeMode = savedSettings.ultraFreeMode;
+            updateFreeModeToggleUI();
+        }
+    }
+
+    console.log('✅ User session initialized for:', uid);
+}
+
+// Persist history to Firestore
+async function persistHistory() {
+    if (!state.currentUser) return;
+    try {
+        await fb.saveUserData(state.currentUser, "history", state.history);
+        console.log('💾 History saved to Firestore');
+    } catch (err) {
+        console.error('❌ Failed to save history:', err);
+    }
+}
+
+// Persist settings to Firestore
+async function persistSettings() {
+    if (!state.currentUser) return;
+    try {
+        const settings = {
+            ultraFreeMode: state.ultraFreeMode,
+            freeMode: state.freeMode
+        };
+        await fb.saveUserData(state.currentUser, "settings", settings);
+        console.log('💾 Settings saved to Firestore');
+    } catch (err) {
+        console.error('❌ Failed to save settings:', err);
+    }
+}
+
+// Listen for auth state changes
+fb.onAuthStateChanged(fb.auth, async (user) => {
+    if (user) {
+        console.log('🔐 User authenticated:', user.email);
+        await initUserSession(user.uid);
+        updateAuthUI(true, user.email);
+    } else {
+        console.log('🔓 User not authenticated');
+        state.currentUser = null;
+        updateAuthUI(false);
+    }
+});
+
+function updateAuthUI(isLoggedIn, email = '') {
+    const loginBtn = document.getElementById('firebase-login-btn');
+    const registerBtn = document.getElementById('firebase-register-btn');
+    const logoutBtn = document.getElementById('firebase-logout-btn');
+    const userEmail = document.getElementById('firebase-user-email');
+
+    if (loginBtn && registerBtn && logoutBtn) {
+        if (isLoggedIn) {
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+            logoutBtn.style.display = 'flex';
+            if (userEmail) userEmail.textContent = email;
+        } else {
+            loginBtn.style.display = 'flex';
+            registerBtn.style.display = 'flex';
+            logoutBtn.style.display = 'none';
+        }
+    }
+}
 
 // ============================================
 // QUICK PROMPTS
@@ -640,6 +773,7 @@ function toggleUltraFreeMode() {
     renderRoles();
     hydrateModelSelects();
     updateFreeModeToggleUI();
+    persistSettings(); // Save to Firebase
 }
 
 function updateFreeModeToggleUI() {
@@ -2175,26 +2309,26 @@ function exportCurrentResults() {
 }
 
 async function sendToNotion() {
-    console.log('sendToNotion called');
+    console.log('🔔 sendToNotion invoked');
 
     const apiKey = localStorage.getItem('satya_notion_api_key');
     const databaseId = localStorage.getItem('satya_notion_db_id');
 
-    console.log('Notion API Key present:', !!apiKey, 'length:', apiKey?.length);
-    console.log('Notion Database ID:', databaseId);
+    console.log('✅ Notion API Key present:', !!apiKey, 'length:', apiKey?.length);
+    console.log('✅ Notion Database ID:', databaseId);
 
     if (!apiKey || !databaseId) {
-        alert('Please configure Notion API Key and Database ID in Settings first.');
+        alert('⚙️ Please set your Notion API Key and Database ID in Settings first.');
         showSettings();
         return;
     }
 
-    const title = document.getElementById('results-title').textContent;
-    const tags = document.getElementById('session-tags').value.split(',').map(t => t.trim()).filter(t => t !== '');
-    const notes = document.getElementById('session-notes').value.trim();
+    const title = document.getElementById('results-title')?.textContent ?? 'Satya Session';
+    const tags = (document.getElementById('session-tags')?.value ?? '').split(',').map(t => t.trim()).filter(t => t !== '');
+    const notes = document.getElementById('session-notes')?.value?.trim() ?? '';
 
     // Get synthesis
-    const synthesisContent = document.getElementById('synthesis-content').innerText;
+    const synthesisContent = document.getElementById('synthesis-content')?.innerText ?? '';
 
     // Get responses - use flexible selectors to handle different card structures
     const responseCards = document.querySelectorAll('#model-responses .response-card');
@@ -2206,6 +2340,8 @@ async function sendToNotion() {
             card.querySelector('.response-content')?.innerText || '';
         return { name: name.trim(), content: content.trim() };
     }).filter(r => r.content.length > 0);
+
+    console.log('📊 Data collected:', { title, tags, notesLength: notes.length, responsesCount: responses.length });
 
     showCopyFeedback('Sending to Notion...');
 
@@ -2265,6 +2401,9 @@ async function sendToNotion() {
         });
     }
 
+    console.log('🌐 Sending request to:', proxyUrl + encodeURIComponent(notionUrl));
+    console.log('📦 Payload size:', JSON.stringify(body).length, 'bytes');
+
     try {
         const response = await fetch(proxyUrl + encodeURIComponent(notionUrl), {
             method: 'POST',
@@ -2276,16 +2415,20 @@ async function sendToNotion() {
             body: JSON.stringify(body)
         });
 
+        console.log('📡 Response status:', response.status, response.statusText);
+
         if (response.ok) {
-            showCopyFeedback('Success! Saved to Notion.');
+            const data = await response.json();
+            console.log('✅ Notion page created:', data);
+            showCopyFeedback('✅ Success! Saved to Notion. 🎉');
         } else {
-            const errorData = await response.json();
-            console.error('Notion Error:', errorData);
-            alert(`Notion Transfer Failed: ${errorData.message || 'Check your API Key and Database ID'}`);
+            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+            console.error('❌ Notion Error:', errorData);
+            alert(`❌ Notion Transfer Failed (${response.status}): ${errorData.message || 'Check your API Key and Database ID'}`);
         }
     } catch (err) {
-        console.error('Fetch Error:', err);
-        alert('Network error or CORS issue. Please check your connection.');
+        console.error('🚨 Fetch Error:', err);
+        alert('🚨 Network error or CORS issue. Please check your connection.\n\nError: ' + err.message);
     }
 }
 
@@ -2361,6 +2504,7 @@ function saveToHistory(type, prompt, modelCount, roles = null, responses = null,
     }
 
     localStorage.setItem('satya_history', JSON.stringify(state.history));
+    persistHistory(); // Save to Firebase
     updateHistoryStats();
 
     // Reset session meta inputs

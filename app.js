@@ -406,6 +406,18 @@ async function showLoginModal() {
     }
 }
 
+async function loginWithGoogle() {
+    try {
+        const cred = await fb.loginWithGoogle();
+        alert(`✅ Logged in as ${cred.user.email}`);
+        await initUserSession(cred.user.uid);
+    } catch (err) {
+        if (err.code !== 'auth/popup-closed-by-user') {
+            alert('❌ Google Login failed: ' + err.message);
+        }
+    }
+}
+
 async function showRegisterModal() {
     const email = prompt('📧 New Email:');
     const password = prompt('🔐 New Password (min 6 characters):');
@@ -497,17 +509,20 @@ fb.onAuthStateChanged(fb.auth, async (user) => {
 function updateAuthUI(isLoggedIn, email = '') {
     const loginBtn = document.getElementById('firebase-login-btn');
     const registerBtn = document.getElementById('firebase-register-btn');
+    const googleLoginBtn = document.getElementById('google-login-btn');
     const logoutBtn = document.getElementById('firebase-logout-btn');
     const userEmail = document.getElementById('firebase-user-email');
 
     if (loginBtn && registerBtn && logoutBtn) {
         if (isLoggedIn) {
             loginBtn.style.display = 'none';
+            if (googleLoginBtn) googleLoginBtn.style.display = 'none';
             registerBtn.style.display = 'none';
             logoutBtn.style.display = 'flex';
             if (userEmail) userEmail.textContent = email;
         } else {
             loginBtn.style.display = 'flex';
+            if (googleLoginBtn) googleLoginBtn.style.display = 'flex';
             registerBtn.style.display = 'flex';
             logoutBtn.style.display = 'none';
         }

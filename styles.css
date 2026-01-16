@@ -819,6 +819,30 @@ body {
     font-weight: 500;
 }
 
+/* Mobile Show More Button */
+.model-show-more-btn {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--teal-accent);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.model-show-more-btn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--teal-accent);
+}
+
 /* Model Tooltip */
 .model-tooltip {
     position: absolute;

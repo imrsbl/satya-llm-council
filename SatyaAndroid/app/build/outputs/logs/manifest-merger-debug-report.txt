@@ -1,0 +1,306 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:2:1-27:12
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:2:1-27:12
+MERGED from [androidx.databinding:viewbinding:8.4.1] /Users/venu/.gradle/caches/transforms-4/8632357b30bc14142777f151b72ba433/transformed/jetified-viewbinding-8.4.1/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.material:material:1.12.0] /Users/venu/.gradle/caches/transforms-4/f36276d9580ce4addc47c17aec65d6de/transformed/material-1.12.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/venu/.gradle/caches/transforms-4/9f26faad48b174f6e8ce795384db839c/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /Users/venu/.gradle/caches/transforms-4/9010deb79b994640810597d2b275b4e2/transformed/jetified-appcompat-resources-1.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.appcompat:appcompat:1.7.0] /Users/venu/.gradle/caches/transforms-4/cf1f5cb063faba76c6b0ef62fa9d3aa5/transformed/appcompat-1.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.webkit:webkit:1.11.0] /Users/venu/.gradle/caches/transforms-4/d0b11491b1ee7f9485ab8882ccf9bee5/transformed/webkit-1.11.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /Users/venu/.gradle/caches/transforms-4/faaf70cf48ec215ceb7fb22168d96934/transformed/jetified-emoji2-views-helper-1.3.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/venu/.gradle/caches/transforms-4/90fd6d88b6b318fc477223ad2e76a145/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.fragment:fragment:1.5.4] /Users/venu/.gradle/caches/transforms-4/360cceb008aa05563092851d5a6e616d/transformed/fragment-1.5.4/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.activity:activity:1.8.0] /Users/venu/.gradle/caches/transforms-4/b6e58a5f64f3297b38b19d22d19466b2/transformed/jetified-activity-1.8.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/venu/.gradle/caches/transforms-4/a47b6c718c0d4af8c2a163d5bfb173d9/transformed/drawerlayout-1.1.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/venu/.gradle/caches/transforms-4/47806379770889199bcc25a29566db2c/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.transition:transition:1.5.0] /Users/venu/.gradle/caches/transforms-4/1951017e2a37586ccad1bcaecacb6130/transformed/transition-1.5.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/venu/.gradle/caches/transforms-4/558982cedef7ff87e962187b66487cf4/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/venu/.gradle/caches/transforms-4/1e1daedbca90a40191e0997281e04f28/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/venu/.gradle/caches/transforms-4/8d725079dd8c3cab420bf5f0a4efc8d0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/venu/.gradle/caches/transforms-4/26e21c0cbc3d6fb230cb62d85dbe0814/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /Users/venu/.gradle/caches/transforms-4/2412a7ab522bc12f8de964dbd82e3660/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/venu/.gradle/caches/transforms-4/23e3588f421707e9e4f57a2965b142c9/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/venu/.gradle/caches/transforms-4/a13b9b93080ec357752fbd96f089a48c/transformed/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.1.0] /Users/venu/.gradle/caches/transforms-4/748e545e9b4e98360e730e94046390d8/transformed/customview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/venu/.gradle/caches/transforms-4/ebe5ea82f5dd435b9353b517e7f9a248/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/venu/.gradle/caches/transforms-4/b244db250d04017a7be1a08225b0c9e7/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/venu/.gradle/caches/transforms-4/994cf083376562b4ca8bf9444cbe1f60/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/venu/.gradle/caches/transforms-4/fdcc7538dbef32051d853775006b686f/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/venu/.gradle/caches/transforms-4/51e99fc92739d78015652589497bd14f/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/venu/.gradle/caches/transforms-4/6695691b4cce8c96a75b94329dff43dd/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/venu/.gradle/caches/transforms-4/6e6dce8dea6e71141d2a7f665ef1f429/transformed/jetified-core-ktx-1.13.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/venu/.gradle/caches/transforms-4/0b10b649d2db302c2002eb1a076ba5cb/transformed/jetified-annotation-experimental-1.4.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/venu/.gradle/caches/transforms-4/e2f7255b5588d9e91aea967d4f2e4478/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/venu/.gradle/caches/transforms-4/3974cb93abc7a38cba4c1bc3915826e0/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/venu/.gradle/caches/transforms-4/86a922d4eaa086cb1e75cd7c8bd67898/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/venu/.gradle/caches/transforms-4/8ffc6e8147a509a5edce8ebc39facb65/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/venu/.gradle/caches/transforms-4/5405eaf0370ced50677937e74f9bbc74/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/venu/.gradle/caches/transforms-4/b0badb5487d1bfeeffb7564664c0e019/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/venu/.gradle/caches/transforms-4/9e668f2430fb7d93e55726fac60023f2/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/venu/.gradle/caches/transforms-4/f52415caca86ed41b681fe21ee53a375/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /Users/venu/.gradle/caches/transforms-4/417ef3595c34ff37b6c4cacd09c230e6/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+	package
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:4:5-67
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:4:22-64
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:5:5-71
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:5:22-68
+application
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:7:5-25:19
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:7:5-25:19
+MERGED from [com.google.android.material:material:1.12.0] /Users/venu/.gradle/caches/transforms-4/f36276d9580ce4addc47c17aec65d6de/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.12.0] /Users/venu/.gradle/caches/transforms-4/f36276d9580ce4addc47c17aec65d6de/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/venu/.gradle/caches/transforms-4/9f26faad48b174f6e8ce795384db839c/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/venu/.gradle/caches/transforms-4/9f26faad48b174f6e8ce795384db839c/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/venu/.gradle/caches/transforms-4/8ffc6e8147a509a5edce8ebc39facb65/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/venu/.gradle/caches/transforms-4/8ffc6e8147a509a5edce8ebc39facb65/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:13:9-35
+	android:label
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:11:9-30
+	android:hardwareAccelerated
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:15:9-43
+	android:roundIcon
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:12:9-54
+	android:icon
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:10:9-43
+	android:allowBackup
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:9:9-35
+	android:theme
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:14:9-50
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:8:9-33
+activity#com.satya.app.MainActivity
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:16:9-24:20
+	android:exported
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:18:13-36
+	android:theme
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:19:13-54
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:17:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:20:13-23:29
+action#android.intent.action.MAIN
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:21:17-69
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:21:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:22:17-77
+	android:name
+		ADDED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml:22:27-74
+uses-sdk
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+MERGED from [androidx.databinding:viewbinding:8.4.1] /Users/venu/.gradle/caches/transforms-4/8632357b30bc14142777f151b72ba433/transformed/jetified-viewbinding-8.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.databinding:viewbinding:8.4.1] /Users/venu/.gradle/caches/transforms-4/8632357b30bc14142777f151b72ba433/transformed/jetified-viewbinding-8.4.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.material:material:1.12.0] /Users/venu/.gradle/caches/transforms-4/f36276d9580ce4addc47c17aec65d6de/transformed/material-1.12.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.12.0] /Users/venu/.gradle/caches/transforms-4/f36276d9580ce4addc47c17aec65d6de/transformed/material-1.12.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/venu/.gradle/caches/transforms-4/9f26faad48b174f6e8ce795384db839c/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/venu/.gradle/caches/transforms-4/9f26faad48b174f6e8ce795384db839c/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /Users/venu/.gradle/caches/transforms-4/9010deb79b994640810597d2b275b4e2/transformed/jetified-appcompat-resources-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /Users/venu/.gradle/caches/transforms-4/9010deb79b994640810597d2b275b4e2/transformed/jetified-appcompat-resources-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] /Users/venu/.gradle/caches/transforms-4/cf1f5cb063faba76c6b0ef62fa9d3aa5/transformed/appcompat-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] /Users/venu/.gradle/caches/transforms-4/cf1f5cb063faba76c6b0ef62fa9d3aa5/transformed/appcompat-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.webkit:webkit:1.11.0] /Users/venu/.gradle/caches/transforms-4/d0b11491b1ee7f9485ab8882ccf9bee5/transformed/webkit-1.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.webkit:webkit:1.11.0] /Users/venu/.gradle/caches/transforms-4/d0b11491b1ee7f9485ab8882ccf9bee5/transformed/webkit-1.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /Users/venu/.gradle/caches/transforms-4/faaf70cf48ec215ceb7fb22168d96934/transformed/jetified-emoji2-views-helper-1.3.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /Users/venu/.gradle/caches/transforms-4/faaf70cf48ec215ceb7fb22168d96934/transformed/jetified-emoji2-views-helper-1.3.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/venu/.gradle/caches/transforms-4/90fd6d88b6b318fc477223ad2e76a145/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/venu/.gradle/caches/transforms-4/90fd6d88b6b318fc477223ad2e76a145/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.5.4] /Users/venu/.gradle/caches/transforms-4/360cceb008aa05563092851d5a6e616d/transformed/fragment-1.5.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.5.4] /Users/venu/.gradle/caches/transforms-4/360cceb008aa05563092851d5a6e616d/transformed/fragment-1.5.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.8.0] /Users/venu/.gradle/caches/transforms-4/b6e58a5f64f3297b38b19d22d19466b2/transformed/jetified-activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.0] /Users/venu/.gradle/caches/transforms-4/b6e58a5f64f3297b38b19d22d19466b2/transformed/jetified-activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/venu/.gradle/caches/transforms-4/a47b6c718c0d4af8c2a163d5bfb173d9/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/venu/.gradle/caches/transforms-4/a47b6c718c0d4af8c2a163d5bfb173d9/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/venu/.gradle/caches/transforms-4/47806379770889199bcc25a29566db2c/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/venu/.gradle/caches/transforms-4/47806379770889199bcc25a29566db2c/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.5.0] /Users/venu/.gradle/caches/transforms-4/1951017e2a37586ccad1bcaecacb6130/transformed/transition-1.5.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.5.0] /Users/venu/.gradle/caches/transforms-4/1951017e2a37586ccad1bcaecacb6130/transformed/transition-1.5.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/venu/.gradle/caches/transforms-4/558982cedef7ff87e962187b66487cf4/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /Users/venu/.gradle/caches/transforms-4/558982cedef7ff87e962187b66487cf4/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/venu/.gradle/caches/transforms-4/1e1daedbca90a40191e0997281e04f28/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/venu/.gradle/caches/transforms-4/1e1daedbca90a40191e0997281e04f28/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/venu/.gradle/caches/transforms-4/8d725079dd8c3cab420bf5f0a4efc8d0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/venu/.gradle/caches/transforms-4/8d725079dd8c3cab420bf5f0a4efc8d0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/venu/.gradle/caches/transforms-4/26e21c0cbc3d6fb230cb62d85dbe0814/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /Users/venu/.gradle/caches/transforms-4/26e21c0cbc3d6fb230cb62d85dbe0814/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/venu/.gradle/caches/transforms-4/2412a7ab522bc12f8de964dbd82e3660/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/venu/.gradle/caches/transforms-4/2412a7ab522bc12f8de964dbd82e3660/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/venu/.gradle/caches/transforms-4/23e3588f421707e9e4f57a2965b142c9/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/venu/.gradle/caches/transforms-4/23e3588f421707e9e4f57a2965b142c9/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/venu/.gradle/caches/transforms-4/a13b9b93080ec357752fbd96f089a48c/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/venu/.gradle/caches/transforms-4/a13b9b93080ec357752fbd96f089a48c/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /Users/venu/.gradle/caches/transforms-4/748e545e9b4e98360e730e94046390d8/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /Users/venu/.gradle/caches/transforms-4/748e545e9b4e98360e730e94046390d8/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/venu/.gradle/caches/transforms-4/ebe5ea82f5dd435b9353b517e7f9a248/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/venu/.gradle/caches/transforms-4/ebe5ea82f5dd435b9353b517e7f9a248/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/venu/.gradle/caches/transforms-4/b244db250d04017a7be1a08225b0c9e7/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /Users/venu/.gradle/caches/transforms-4/b244db250d04017a7be1a08225b0c9e7/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/venu/.gradle/caches/transforms-4/994cf083376562b4ca8bf9444cbe1f60/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /Users/venu/.gradle/caches/transforms-4/994cf083376562b4ca8bf9444cbe1f60/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/venu/.gradle/caches/transforms-4/fdcc7538dbef32051d853775006b686f/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /Users/venu/.gradle/caches/transforms-4/fdcc7538dbef32051d853775006b686f/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/venu/.gradle/caches/transforms-4/51e99fc92739d78015652589497bd14f/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /Users/venu/.gradle/caches/transforms-4/51e99fc92739d78015652589497bd14f/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/venu/.gradle/caches/transforms-4/6695691b4cce8c96a75b94329dff43dd/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /Users/venu/.gradle/caches/transforms-4/6695691b4cce8c96a75b94329dff43dd/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/venu/.gradle/caches/transforms-4/6e6dce8dea6e71141d2a7f665ef1f429/transformed/jetified-core-ktx-1.13.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/venu/.gradle/caches/transforms-4/6e6dce8dea6e71141d2a7f665ef1f429/transformed/jetified-core-ktx-1.13.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/venu/.gradle/caches/transforms-4/0b10b649d2db302c2002eb1a076ba5cb/transformed/jetified-annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/venu/.gradle/caches/transforms-4/0b10b649d2db302c2002eb1a076ba5cb/transformed/jetified-annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/venu/.gradle/caches/transforms-4/e2f7255b5588d9e91aea967d4f2e4478/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/venu/.gradle/caches/transforms-4/e2f7255b5588d9e91aea967d4f2e4478/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/venu/.gradle/caches/transforms-4/3974cb93abc7a38cba4c1bc3915826e0/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /Users/venu/.gradle/caches/transforms-4/3974cb93abc7a38cba4c1bc3915826e0/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/venu/.gradle/caches/transforms-4/86a922d4eaa086cb1e75cd7c8bd67898/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/venu/.gradle/caches/transforms-4/86a922d4eaa086cb1e75cd7c8bd67898/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/venu/.gradle/caches/transforms-4/8ffc6e8147a509a5edce8ebc39facb65/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/venu/.gradle/caches/transforms-4/8ffc6e8147a509a5edce8ebc39facb65/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/venu/.gradle/caches/transforms-4/5405eaf0370ced50677937e74f9bbc74/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/venu/.gradle/caches/transforms-4/5405eaf0370ced50677937e74f9bbc74/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/venu/.gradle/caches/transforms-4/b0badb5487d1bfeeffb7564664c0e019/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/venu/.gradle/caches/transforms-4/b0badb5487d1bfeeffb7564664c0e019/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/venu/.gradle/caches/transforms-4/9e668f2430fb7d93e55726fac60023f2/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /Users/venu/.gradle/caches/transforms-4/9e668f2430fb7d93e55726fac60023f2/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/venu/.gradle/caches/transforms-4/f52415caca86ed41b681fe21ee53a375/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/venu/.gradle/caches/transforms-4/f52415caca86ed41b681fe21ee53a375/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /Users/venu/.gradle/caches/transforms-4/417ef3595c34ff37b6c4cacd09c230e6/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /Users/venu/.gradle/caches/transforms-4/417ef3595c34ff37b6c4cacd09c230e6/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/venu/Desktop/Business/Antigravity/Satya LLM Council/SatyaAndroid/app/src/main/AndroidManifest.xml
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/venu/.gradle/caches/transforms-4/42b21f6e6307628a4af206dddd35f7a1/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /Users/venu/.gradle/caches/transforms-4/058e9fb3fdf74394ad1fa81b666b94f1/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:30:17-75
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+permission#com.satya.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+uses-permission#com.satya.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/venu/.gradle/caches/transforms-4/8ab886545ad73715b8cb3ae7ed41321d/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /Users/venu/.gradle/caches/transforms-4/6e38941421a6a66fa0d181b63a17bba8/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/venu/.gradle/caches/transforms-4/f63a69c3925b1f837c3d237a9eb0e869/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:25-92

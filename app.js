@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 
-const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = ''; // REMOVED FOR SECURITY - User must provide key
 
 const FREE_MODELS = [
     { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', provider: 'Meta Free' },
@@ -278,8 +278,71 @@ document.addEventListener('DOMContentLoaded', () => {
     setupKeyboardShortcuts();
     setupPasteListeners();
     loadPresetDropdowns();
+    loadPresetDropdowns();
     loadLeaderboardData();
+    renderRandomQuickPrompts();
 });
+
+// ============================================
+// QUICK PROMPTS
+// ============================================
+
+const QUICK_PROMPTS_LIBRARY = [
+    { label: 'DeFi Risk', text: 'Analyze the smart contract risks of Aave V3 on Arbitrum.' },
+    { label: 'L2 Scaling', text: 'Compare the technical architecture of Optimism Bedrock vs Arbitrum Nitro.' },
+    { label: 'ZK Tech', text: 'Explain zk-SNARKs vs zk-STARKs for a non-technical audience.' },
+    { label: 'AI Code', text: 'Write a Python script to optimize portfolio allocation using Monte Carlo simulation.' },
+    { label: 'Tokenomics', text: 'Critique the tokenomics of the latest EIGEN layer protocol.' },
+    { label: 'Market', text: 'What are the macro tailwinds for RWA tokenization in 2026?' },
+    { label: 'Security', text: 'How does account abstraction (ERC-4337) impact wallet security?' },
+    { label: 'Privacy', text: 'Analyze the privacy implications of CBDCs vs private stablecoins.' },
+    { label: 'Solidity', text: 'Write a secure ERC-20 token contract with permit functionality.' },
+    { label: 'Rust', text: 'Explain the advantages of Rust for Solana program development.' },
+    { label: 'NFTs', text: 'What is the future of dynamic NFTs beyond simple PFPs?' },
+    { label: 'DAOs', text: 'Propose a governance framework for a decentralized lending protocol.' },
+    { label: 'MEV', text: 'Explain Proposer-Builder Separation (PBS) and its impact on MEV.' },
+    { label: 'Bridging', text: 'Analyze the security model of LayerZero vs Wormhole.' },
+    { label: 'Identity', text: 'How can Zero-Knowledge proofs solve decentralized identity (DID)?' },
+    { label: 'Stablecoins', text: 'Compare the stability mechanisms of DAI, FRAX, and LUSD.' },
+    { label: 'Regulation', text: 'What are the implications of MiCA regulation for DeFi protocols?' },
+    { label: 'Integration', text: 'How to integrate Chainlink Oracles into a prediction market?' },
+    { label: 'Hypothesis', text: 'Formulate a hypothesis on the next major narrative in crypto.' },
+    { label: 'Audit', text: 'What are the most common vulnerabilities found in DeFi hacks 2025?' }
+];
+
+function renderRandomQuickPrompts() {
+    // Select 4 unique random prompts
+    const shuffled = [...QUICK_PROMPTS_LIBRARY].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 4);
+
+    const chipHtml = selected.map(p =>
+        `<button class="quick-chip" onclick="setPrompt('${p.text.replace(/'/g, "\\'")}', 'council')">${p.label}</button>`
+    ).join('');
+
+    document.querySelectorAll('.quick-prompts').forEach(container => {
+        const label = container.querySelector('.quick-label');
+        if (label) {
+            container.innerHTML = '';
+            container.appendChild(label);
+            container.insertAdjacentHTML('beforeend', chipHtml);
+        }
+    });
+
+    // Also update window.setPrompt to handle mode specific setting if needed
+    window.setPrompt = function (text, mode) {
+        // Find the active tab first to determine which prompt input to target if mode generic
+        const activeTab = state.currentTab;
+        const targetMode = mode || activeTab;
+        const textarea = document.getElementById(`${targetMode}-prompt`);
+        if (textarea) {
+            textarea.value = text;
+            textarea.focus();
+            // Trigger auto-resize if implemented
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+    };
+}
 
 function initNavigation() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -335,7 +398,13 @@ function renderCouncilModels() {
         return matchesSearch && matchesTags;
     });
 
-    container.innerHTML = filteredModels.map(model => {
+    // Mobile filter: Show only top 4 by default on mobile
+    const isMobile = window.innerWidth < 768;
+    const SHOW_LIMIT = 4;
+    const shouldLimit = isMobile && !state.showAllModels && filteredModels.length > SHOW_LIMIT;
+    const displayModels = shouldLimit ? filteredModels.slice(0, SHOW_LIMIT) : filteredModels;
+
+    container.innerHTML = displayModels.map(model => {
         const metadata = MODEL_METADATA[model.id] || { tooltip: 'AI model', tags: [] };
         const tagBadges = metadata.tags ? metadata.tags.slice(0, 2).map(tag =>
             `<span class="model-tag">${tag}</span>`
@@ -354,6 +423,24 @@ function renderCouncilModels() {
             <div class="model-tooltip">${metadata.tooltip}</div>
         </div>
     `}).join('');
+
+    // Add Toggle Button for Mobile
+    if (isMobile && filteredModels.length > SHOW_LIMIT) {
+        const remainingCount = filteredModels.length - SHOW_LIMIT;
+        const toggleBtn = document.createElement('div');
+        toggleBtn.className = 'model-show-more-btn';
+        toggleBtn.innerHTML = state.showAllModels
+            ? `Show Less <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>`
+            : `Show All (${remainingCount} more) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
+        toggleBtn.onclick = () => {
+            state.showAllModels = !state.showAllModels;
+            renderCouncilModels();
+        };
+        container.appendChild(toggleBtn);
+    } else {
+        // Reset state if not needed to avoid getting stuck
+        if (!isMobile) state.showAllModels = false;
+    }
 
     // Update selection counter
     updateSelectionCounter('council');
@@ -385,7 +472,13 @@ function renderEnsembleModels() {
         return matchesSearch && matchesTags;
     });
 
-    container.innerHTML = filteredModels.map(model => {
+    // Mobile filter: Show only top 4 by default on mobile
+    const isMobile = window.innerWidth < 768;
+    const SHOW_LIMIT = 4;
+    const shouldLimit = isMobile && !state.showAllModelsEnsemble && filteredModels.length > SHOW_LIMIT;
+    const displayModels = shouldLimit ? filteredModels.slice(0, SHOW_LIMIT) : filteredModels;
+
+    container.innerHTML = displayModels.map(model => {
         const metadata = MODEL_METADATA[model.id] || { tooltip: 'AI model', tags: [] };
         const tagBadges = metadata.tags ? metadata.tags.slice(0, 2).map(tag =>
             `<span class="model-tag">${tag}</span>`
@@ -404,6 +497,22 @@ function renderEnsembleModels() {
             <div class="model-tooltip">${metadata.tooltip}</div>
         </div>
     `}).join('');
+
+    // Add Toggle Button for Mobile
+    if (isMobile && filteredModels.length > SHOW_LIMIT) {
+        const remainingCount = filteredModels.length - SHOW_LIMIT;
+        const toggleBtn = document.createElement('div');
+        toggleBtn.className = 'model-show-more-btn';
+        toggleBtn.style.gridColumn = "1 / -1"; // Make it span full width
+        toggleBtn.innerHTML = state.showAllModelsEnsemble
+            ? `Show Less <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>`
+            : `Show All (${remainingCount} more) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
+        toggleBtn.onclick = () => {
+            state.showAllModelsEnsemble = !state.showAllModelsEnsemble;
+            renderEnsembleModels();
+        };
+        container.appendChild(toggleBtn);
+    }
 
     document.getElementById('ensemble-count').textContent = `${state.selectedEnsembleModels.length} selected`;
 
@@ -1040,257 +1149,295 @@ function setPrompt(mode, prompt) {
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function streamResponse(model, prompt, systemPrompt = '', attachments = [], retryCount = 0) {
-    const apiKey = localStorage.getItem('satya_api_key') || OPENROUTER_API_KEY;
-    const localEnabled = document.getElementById('local-llm-toggle')?.classList.contains('active');
-    const localEndpoint = document.getElementById('local-endpoint-input')?.value || 'http://localhost:11434/v1';
+const OPENROUTER_API_KEY = ''; // REMOVED FOR SECURITY - User must provide key
 
-    // Choose endpoint based on local toggle
-    // If local is enabled, we try local first for any model id that doesn't look like an absolute OpenRouter path or if it's a specific local model
-    // For now, let's assume if local is active, we use the local endpoint.
-    const url = localEnabled ? `${localEndpoint}/chat/completions` : 'https://openrouter.ai/api/v1/chat/completions';
+const FREE_MODELS = [
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', provider: 'Meta Free' },
+    { id: 'deepseek/deepseek-r1-0528:free', name: 'DeepSeek R1', provider: 'DeepSeek Free' },
+    // ... (rest of models)
 
-    const MAX_RETRIES = 3;
+    // ...
 
-    try {
-        const messages = [];
-        if (systemPrompt) {
-            messages.push({ role: 'system', content: systemPrompt });
+    async function streamResponse(model, prompt, systemPrompt = '', attachments = [], retryCount = 0) {
+        // Get key from storage, or empty string. NEVER use a hardcoded fallback in public code.
+        const apiKey = localStorage.getItem('satya_api_key') || '';
+
+        // Check if key is missing for non-local requests
+        const localEnabled = document.getElementById('local-llm-toggle')?.classList.contains('active');
+
+        if (!localEnabled && !apiKey) {
+            // Trigger login if no key
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('login-error').textContent = 'Please enter your API Key to continue';
+            document.getElementById('login-error').style.display = 'block';
+            throw new Error('No API key provided');
         }
 
-        // Handle multimodal content
-        let content;
-        if (attachments && attachments.length > 0) {
-            content = [{ type: 'text', text: prompt }];
-            for (const attachment of attachments) {
-                if (attachment.type.startsWith('image/')) {
-                    content.push({
-                        type: 'image_url',
-                        image_url: { url: attachment.data }
-                    });
-                } else {
-                    content.push({
-                        type: 'text',
-                        text: `[File Attachment: ${attachment.name}]`
-                    });
+        const localEndpoint = document.getElementById('local-endpoint-input')?.value || 'http://localhost:11434/v1';
+
+        // Choose endpoint based on local toggle
+        const url = localEnabled ? `${localEndpoint}/chat/completions` : 'https://openrouter.ai/api/v1/chat/completions';
+
+        const MAX_RETRIES = 3;
+
+        try {
+            const messages = [];
+            if (systemPrompt) {
+                messages.push({ role: 'system', content: systemPrompt });
+            }
+
+            // Handle multimodal content
+            let content;
+            if (attachments && attachments.length > 0) {
+                content = [{ type: 'text', text: prompt }];
+                for (const attachment of attachments) {
+                    if (attachment.type.startsWith('image/')) {
+                        content.push({
+                            type: 'image_url',
+                            image_url: { url: attachment.data }
+                        });
+                    } else {
+                        content.push({
+                            type: 'text',
+                            text: `[File Attachment: ${attachment.name}]`
+                        });
+                    }
                 }
+            } else {
+                content = prompt;
             }
-        } else {
-            content = prompt;
-        }
 
-        messages.push({ role: 'user', content: content });
+            messages.push({ role: 'user', content: content });
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': localEnabled ? '' : `Bearer ${apiKey}`,
-                'HTTP-Referer': window.location.origin,
-                'X-Title': 'Satya AI Council'
-            },
-            body: JSON.stringify({
-                model: model,
-                messages: messages,
-                stream: true,
-                max_tokens: 4000
-            })
-        });
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localEnabled ? '' : `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Satya AI Council'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: messages,
+                    stream: true,
+                    max_tokens: 4000
+                })
+            });
 
-        if (response.status === 429 && retryCount < MAX_RETRIES && !localEnabled) {
-            const delay = Math.pow(2, retryCount) * 1000 + (Math.random() * 1000);
-            console.warn(`Rate limited (429). Retrying in ${Math.round(delay)}ms...`);
-            await sleep(delay);
-            return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
-        }
+            // HANDLE 401 UNAUTHORIZED (Key Revoked/Invalid)
+            if (response.status === 401) {
+                console.error("API Key Rejected (401). Clearing stored key.");
+                localStorage.removeItem('satya_api_key');
+                localStorage.removeItem('satya_auth'); // Force re-login
 
-        if (!response.ok) {
-            // If local fail, potentially fallback to OpenRouter
-            if (localEnabled) {
-                console.error(`Local LLM error: ${response.status}. Falling back to OpenRouter...`);
-                // Disable local toggle for this call and retry
-                return streamResponse(model, prompt, systemPrompt, attachments, retryCount, false);
+                // Show Login Overlay with specific message
+                document.getElementById('login-overlay').style.display = 'flex';
+                const errorMsg = document.getElementById('login-error');
+                if (errorMsg) {
+                    errorMsg.textContent = 'Action Required: Your API Key is invalid or expired. Please update it.';
+                    errorMsg.style.display = 'block';
+                    errorMsg.style.color = '#ff4444';
+                }
+                throw new Error('API Key Invalid - Please update in Login');
             }
-            throw new Error(`API error: ${response.status}`);
-        }
 
-        return response.body.getReader();
-    } catch (error) {
-        if (retryCount < MAX_RETRIES) {
-            await sleep(1000);
-            return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
+            if (response.status === 429 && retryCount < MAX_RETRIES && !localEnabled) {
+                const delay = Math.pow(2, retryCount) * 1000 + (Math.random() * 1000);
+                console.warn(`Rate limited (429). Retrying in ${Math.round(delay)}ms...`);
+                await sleep(delay);
+                return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
+            }
+
+            if (!response.ok) {
+                // If local fail, potentially fallback to OpenRouter
+                if (localEnabled) {
+                    console.error(`Local LLM error: ${response.status}. Falling back to OpenRouter...`);
+                    // Disable local toggle for this call and retry
+                    return streamResponse(model, prompt, systemPrompt, attachments, retryCount, false);
+                }
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            return response.body.getReader();
+        } catch (error) {
+            if (error.message.includes('API Key Invalid')) throw error; // Don't retry invalid keys
+
+            if (retryCount < MAX_RETRIES) {
+                await sleep(1000);
+                return streamResponse(model, prompt, systemPrompt, attachments, retryCount + 1);
+            }
+            throw error;
         }
-        throw error;
     }
-}
 
 async function processStream(reader, onChunk, onComplete) {
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let fullContent = '';
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullContent = '';
 
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
 
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || '';
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
 
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.slice(6);
-                    if (data === '[DONE]') continue;
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') continue;
 
-                    try {
-                        const json = JSON.parse(data);
-                        const content = json.choices?.[0]?.delta?.content;
-                        if (content) {
-                            fullContent += content;
-                            onChunk(content, fullContent);
+                        try {
+                            const json = JSON.parse(data);
+                            const content = json.choices?.[0]?.delta?.content;
+                            if (content) {
+                                fullContent += content;
+                                onChunk(content, fullContent);
+                            }
+                        } catch (e) {
+                            // Skip invalid JSON
                         }
-                    } catch (e) {
-                        // Skip invalid JSON
                     }
                 }
             }
+        } catch (error) {
+            console.error('Stream error:', error);
         }
-    } catch (error) {
-        console.error('Stream error:', error);
-    }
 
-    onComplete(fullContent);
-}
+        onComplete(fullContent);
+    }
 
 // ============================================
 // COUNCIL MODE
 // ============================================
 
 async function startCouncil(isContinue = false) {
-    const originalPrompt = document.getElementById('council-prompt').value.trim();
-    if (!originalPrompt) {
-        alert('Please enter a research prompt.');
-        return;
-    }
-
-    if (state.selectedCouncilModels.length < 2) {
-        alert('Please select at least 2 models for the council.');
-        return;
-    }
-
-    // Refresh state from UI elements
-    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('council-rounds')?.value || 1);
-    state.peerRankingEnabled = document.getElementById('council-peer-ranking-toggle')?.classList.contains('active');
-    const chairman = document.getElementById('chairman-select').value;
-
-    if (!isContinue) showResults('Council Deliberation');
-    else document.getElementById('results-panel').classList.remove('hidden');
-
-    const responsesContainer = document.getElementById('model-responses');
-    const existingSynthesis = document.getElementById('synthesis-content').textContent;
-
-    let currentContext = isContinue ? `Initial Prompt: ${originalPrompt}\n\nPrevious Synthesis: ${existingSynthesis}\n\nTask: Continue the research, refine details, and address unexplored angles.` : originalPrompt;
-    let finalModelResponses = {};
-    let finalSynthesis = '';
-
-    const totalRoundsToRun = roundsToRun;
-
-    for (let round = 1; round <= totalRoundsToRun; round++) {
-        // If continuing, we treat this as a new round offset by existing state if we tracked it, 
-        // but for now let's just label it "Continued Research"
-        const displayRound = isContinue ? 'Continuation' : round;
-        const roundTitle = !isContinue && totalRoundsToRun > 1 ? ` (Round ${round}/${totalRoundsToRun})` : (isContinue ? ' (Continuation)' : '');
-        document.getElementById('results-title').textContent = `Council Deliberation${roundTitle}`;
-
-        const modelResponses = {};
-        const responsesContainer = document.getElementById('model-responses');
-
-        // Clear or prepare container for round
-        if (round === 1) responsesContainer.innerHTML = '';
-
-        // Add round header if multi-round
-        if (state.roundsCount > 1) {
-            const roundHeader = document.createElement('div');
-            roundHeader.className = 'round-header';
-            roundHeader.style = 'grid-column: 1 / -1; margin: 20px 0 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; font-weight: 700; color: var(--teal-accent);';
-            roundHeader.innerHTML = `ROUND ${round}: ${round === 1 ? 'Initial Analysis' : 'Deepening Insights'}`;
-            responsesContainer.appendChild(roundHeader);
+        const originalPrompt = document.getElementById('council-prompt').value.trim();
+        if (!originalPrompt) {
+            alert('Please enter a research prompt.');
+            return;
         }
 
-        // Create individual cards for this round
-        state.selectedCouncilModels.forEach(modelId => {
-            const model = findModelById(modelId);
-            const cardId = `${modelId}-round-${round}`;
-            const cardHtml = createResponseCard(model.name, model.provider, cardId);
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cardHtml;
-            responsesContainer.appendChild(tempDiv.firstElementChild);
-        });
+        if (state.selectedCouncilModels.length < 2) {
+            alert('Please select at least 2 models for the council.');
+            return;
+        }
 
-        const roundPromises = state.selectedCouncilModels.map(async (modelId) => {
-            const cardId = `${modelId}-round-${round}`;
-            const systemPrompt = `You are a member of an AI council. 
+        // Refresh state from UI elements
+        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('council-rounds')?.value || 1);
+        state.peerRankingEnabled = document.getElementById('council-peer-ranking-toggle')?.classList.contains('active');
+        const chairman = document.getElementById('chairman-select').value;
+
+        if (!isContinue) showResults('Council Deliberation');
+        else document.getElementById('results-panel').classList.remove('hidden');
+
+        const responsesContainer = document.getElementById('model-responses');
+        const existingSynthesis = document.getElementById('synthesis-content').textContent;
+
+        let currentContext = isContinue ? `Initial Prompt: ${originalPrompt}\n\nPrevious Synthesis: ${existingSynthesis}\n\nTask: Continue the research, refine details, and address unexplored angles.` : originalPrompt;
+        let finalModelResponses = {};
+        let finalSynthesis = '';
+
+        const totalRoundsToRun = roundsToRun;
+
+        for (let round = 1; round <= totalRoundsToRun; round++) {
+            // If continuing, we treat this as a new round offset by existing state if we tracked it, 
+            // but for now let's just label it "Continued Research"
+            const displayRound = isContinue ? 'Continuation' : round;
+            const roundTitle = !isContinue && totalRoundsToRun > 1 ? ` (Round ${round}/${totalRoundsToRun})` : (isContinue ? ' (Continuation)' : '');
+            document.getElementById('results-title').textContent = `Council Deliberation${roundTitle}`;
+
+            const modelResponses = {};
+            const responsesContainer = document.getElementById('model-responses');
+
+            // Clear or prepare container for round
+            if (round === 1) responsesContainer.innerHTML = '';
+
+            // Add round header if multi-round
+            if (state.roundsCount > 1) {
+                const roundHeader = document.createElement('div');
+                roundHeader.className = 'round-header';
+                roundHeader.style = 'grid-column: 1 / -1; margin: 20px 0 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px; font-weight: 700; color: var(--teal-accent);';
+                roundHeader.innerHTML = `ROUND ${round}: ${round === 1 ? 'Initial Analysis' : 'Deepening Insights'}`;
+                responsesContainer.appendChild(roundHeader);
+            }
+
+            // Create individual cards for this round
+            state.selectedCouncilModels.forEach(modelId => {
+                const model = findModelById(modelId);
+                const cardId = `${modelId}-round-${round}`;
+                const cardHtml = createResponseCard(model.name, model.provider, cardId);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardHtml;
+                responsesContainer.appendChild(tempDiv.firstElementChild);
+            });
+
+            const roundPromises = state.selectedCouncilModels.map(async (modelId) => {
+                const cardId = `${modelId}-round-${round}`;
+                const systemPrompt = `You are a member of an AI council. 
             ${round > 1 ? `This is Round ${round} of the deliberation. Build upon the previous synthesis to provide deeper technical insights.` : 'Provide your initial expert analysis.'}
             Focus on accuracy, edge cases, and verifiable facts.`;
 
-            const attemptRequest = async (retry = false) => {
-                try {
-                    const reader = await streamResponse(modelId, currentContext, systemPrompt, state.attachments.council);
-                    await processStream(
-                        reader,
-                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                        (full) => {
-                            modelResponses[modelId] = full;
-                            updateResponseCard(cardId, full, 'complete');
+                const attemptRequest = async (retry = false) => {
+                    try {
+                        const reader = await streamResponse(modelId, currentContext, systemPrompt, state.attachments.council);
+                        await processStream(
+                            reader,
+                            (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                            (full) => {
+                                modelResponses[modelId] = full;
+                                updateResponseCard(cardId, full, 'complete');
+                            }
+                        );
+                    } catch (error) {
+                        if (!retry) {
+                            console.log(`Retrying ${modelId} after error: ${error.message}`);
+                            await sleep(2000);
+                            return attemptRequest(true);
                         }
-                    );
-                } catch (error) {
-                    if (!retry) {
-                        console.log(`Retrying ${modelId} after error: ${error.message}`);
-                        await sleep(2000);
-                        return attemptRequest(true);
+                        updateResponseCard(cardId, `Error: ${error.message}`, 'error');
                     }
-                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
-                }
-            };
-            await attemptRequest();
-        });
+                };
+                await attemptRequest();
+            });
 
-        await Promise.all(roundPromises);
-        finalModelResponses = modelResponses;
+            await Promise.all(roundPromises);
+            finalModelResponses = modelResponses;
 
-        // Conduct synthesis for the round
-        const intermediateSynthesis = await synthesizeCouncil(chairman, originalPrompt, modelResponses, round, state.roundsCount);
-        finalSynthesis = intermediateSynthesis;
+            // Conduct synthesis for the round
+            const intermediateSynthesis = await synthesizeCouncil(chairman, originalPrompt, modelResponses, round, state.roundsCount);
+            finalSynthesis = intermediateSynthesis;
 
-        // If another round follows, update context
-        if (round < state.roundsCount) {
-            currentContext = `Original Question: ${originalPrompt}\n\nPrevious Council Synthesis (Round ${round}):\n${intermediateSynthesis}\n\nTask: Analyze the above synthesis. Identify what's missing, where deeper technical detail is needed, or if there are any subtle risks not yet addressed. Provide a deeper, more refined level of research.`;
+            // If another round follows, update context
+            if (round < state.roundsCount) {
+                currentContext = `Original Question: ${originalPrompt}\n\nPrevious Council Synthesis (Round ${round}):\n${intermediateSynthesis}\n\nTask: Analyze the above synthesis. Identify what's missing, where deeper technical detail is needed, or if there are any subtle risks not yet addressed. Provide a deeper, more refined level of research.`;
+            }
         }
-    }
 
-    // After all rounds, conduct Peer Ranking if enabled
-    if (state.peerRankingEnabled) {
-        await conductPeerRanking(originalPrompt, finalModelResponses);
-    }
+        // After all rounds, conduct Peer Ranking if enabled
+        if (state.peerRankingEnabled) {
+            await conductPeerRanking(originalPrompt, finalModelResponses);
+        }
 
-    saveToHistory('council', originalPrompt, state.selectedCouncilModels.length, null, finalModelResponses, finalSynthesis);
-}
+        saveToHistory('council', originalPrompt, state.selectedCouncilModels.length, null, finalModelResponses, finalSynthesis);
+    }
 
 async function synthesizeCouncil(chairmanModel, originalPrompt, responses, round = 1, totalRounds = 1) {
-    const synthesisPanel = document.getElementById('synthesis-panel');
-    const synthesisContent = document.getElementById('synthesis-content');
-    synthesisPanel.classList.remove('hidden');
-    synthesisContent.innerHTML = '<span class="cursor"></span>';
+        const synthesisPanel = document.getElementById('synthesis-panel');
+        const synthesisContent = document.getElementById('synthesis-content');
+        synthesisPanel.classList.remove('hidden');
+        synthesisContent.innerHTML = '<span class="cursor"></span>';
 
-    const responseSummary = Object.entries(responses).map(([modelId, response]) => {
-        const model = findModelById(modelId);
-        return `## ${model.name}'s Analysis:\n${response}`;
-    }).join('\n\n---\n\n');
+        const responseSummary = Object.entries(responses).map(([modelId, response]) => {
+            const model = findModelById(modelId);
+            return `## ${model.name}'s Analysis:\n${response}`;
+        }).join('\n\n---\n\n');
 
-    const isFinalRound = round === totalRounds;
-    const synthesisPrompt = `You are the Chairman of an AI Council. Multiple AI models have analyzed the following question:
+        const isFinalRound = round === totalRounds;
+        const synthesisPrompt = `You are the Chairman of an AI Council. Multiple AI models have analyzed the following question:
 
 **Original Question:** ${originalPrompt}
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
@@ -1307,127 +1454,127 @@ ${isFinalRound ? '4. **Actionable Recommendations** - Clear next steps' : '4. **
 
 Be thorough but organized. Highlight the most valuable insights from each council member.`;
 
-    let synthesisText = '';
-    try {
-        const reader = await streamResponse(chairmanModel, synthesisPrompt);
-        await processStream(
-            reader,
-            (chunk, full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-            },
-            (full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full);
-            }
-        );
-    } catch (error) {
-        synthesisText = `Error generating synthesis: ${error.message}`;
-        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        let synthesisText = '';
+        try {
+            const reader = await streamResponse(chairmanModel, synthesisPrompt);
+            await processStream(
+                reader,
+                (chunk, full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+                },
+                (full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                }
+            );
+        } catch (error) {
+            synthesisText = `Error generating synthesis: ${error.message}`;
+            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        }
+        return synthesisText;
     }
-    return synthesisText;
-}
 
 // ============================================
 // DxO MODE
 // ============================================
 
 async function startDxO(isContinue = false) {
-    const prompt = document.getElementById('dxo-prompt').value.trim();
-    if (!prompt) {
-        alert('Please enter a problem statement or research question.');
-        return;
-    }
-
-    if (state.roles.length === 0) {
-        alert('Please add at least one role.');
-        return;
-    }
-
-    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('dxo-rounds')?.value || 1);
-    const existingSynthesis = document.getElementById('synthesis-content').textContent;
-
-    if (!isContinue) showResults('DxO Decision Analysis');
-    else document.getElementById('results-panel').classList.remove('hidden');
-
-    let currentContext = isContinue ? existingSynthesis : '';
-    let finalRoleResponses = {};
-    let finalSynthesis = '';
-
-    for (let round = 1; round <= roundsToRun; round++) {
-        const displayRound = isContinue ? 'Continuation' : round;
-        const totalDisplay = isContinue ? 'Continuation' : roundsToRun;
-
-        if (!isContinue && roundsToRun > 1) {
-            document.getElementById('results-title').textContent = `DxO Analysis - Round ${round} of ${roundsToRun}`;
-        } else if (isContinue) {
-            document.getElementById('results-title').textContent = `DxO Analysis - Continuation`;
+        const prompt = document.getElementById('dxo-prompt').value.trim();
+        if (!prompt) {
+            alert('Please enter a problem statement or research question.');
+            return;
         }
 
-        const roleResponses = {};
-        const responsesContainer = document.getElementById('model-responses');
-        if (round === 1) responsesContainer.innerHTML = '';
+        if (state.roles.length === 0) {
+            alert('Please add at least one role.');
+            return;
+        }
 
-        // Query all roles in parallel
-        const promises = state.roles.map(async (role, index) => {
-            const cardId = `${role.name.replace(/\s+/g, '-')}-round-${round}`;
+        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('dxo-rounds')?.value || 1);
+        const existingSynthesis = document.getElementById('synthesis-content').textContent;
 
-            // Create a new card for this round
-            const cardHtml = createResponseCard(role.name, role.perspective, cardId);
-            responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
+        if (!isContinue) showResults('DxO Decision Analysis');
+        else document.getElementById('results-panel').classList.remove('hidden');
 
-            if (index > 0) await sleep(index * 1000); // Slight stagger
+        let currentContext = isContinue ? existingSynthesis : '';
+        let finalRoleResponses = {};
+        let finalSynthesis = '';
 
-            let systemPrompt = `You are acting as the ${role.name} in a multi-perspective analysis team.
+        for (let round = 1; round <= roundsToRun; round++) {
+            const displayRound = isContinue ? 'Continuation' : round;
+            const totalDisplay = isContinue ? 'Continuation' : roundsToRun;
+
+            if (!isContinue && roundsToRun > 1) {
+                document.getElementById('results-title').textContent = `DxO Analysis - Round ${round} of ${roundsToRun}`;
+            } else if (isContinue) {
+                document.getElementById('results-title').textContent = `DxO Analysis - Continuation`;
+            }
+
+            const roleResponses = {};
+            const responsesContainer = document.getElementById('model-responses');
+            if (round === 1) responsesContainer.innerHTML = '';
+
+            // Query all roles in parallel
+            const promises = state.roles.map(async (role, index) => {
+                const cardId = `${role.name.replace(/\s+/g, '-')}-round-${round}`;
+
+                // Create a new card for this round
+                const cardHtml = createResponseCard(role.name, role.perspective, cardId);
+                responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
+
+                if (index > 0) await sleep(index * 1000); // Slight stagger
+
+                let systemPrompt = `You are acting as the ${role.name} in a multi-perspective analysis team.
 Your focus: ${role.perspective}
 Your instructions: ${role.instructions}`;
 
-            if (round > 1) {
-                systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the synthesis above, refine your analysis. Focus on addressing any gaps or debating points identified.`;
-            }
+                if (round > 1) {
+                    systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the synthesis above, refine your analysis. Focus on addressing any gaps or debating points identified.`;
+                }
 
-            systemPrompt += `\n\nAnalyze the following problem from your unique perspective. Be thorough but stay focused on your specific role.`;
+                systemPrompt += `\n\nAnalyze the following problem from your unique perspective. Be thorough but stay focused on your specific role.`;
 
-            try {
-                const reader = await streamResponse(role.model, prompt, systemPrompt, state.attachments.dxo);
-                await processStream(
-                    reader,
-                    (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                    (full) => {
-                        roleResponses[role.name] = { response: full, role: role };
-                        updateResponseCard(cardId, full, 'complete');
-                    }
-                );
-            } catch (error) {
-                updateResponseCard(cardId, `Error: ${error.message}`, 'error');
-            }
-        });
+                try {
+                    const reader = await streamResponse(role.model, prompt, systemPrompt, state.attachments.dxo);
+                    await processStream(
+                        reader,
+                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                        (full) => {
+                            roleResponses[role.name] = { response: full, role: role };
+                            updateResponseCard(cardId, full, 'complete');
+                        }
+                    );
+                } catch (error) {
+                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+                }
+            });
 
-        await Promise.all(promises);
+            await Promise.all(promises);
 
-        finalRoleResponses = { ...finalRoleResponses, ...roleResponses };
-        finalSynthesis = await synthesizeDxO(prompt, roleResponses, round, totalRounds);
-        currentContext = finalSynthesis;
+            finalRoleResponses = { ...finalRoleResponses, ...roleResponses };
+            finalSynthesis = await synthesizeDxO(prompt, roleResponses, round, totalRounds);
+            currentContext = finalSynthesis;
+        }
+
+        // Save to history
+        saveToHistory('dxo', prompt, state.roles.length, state.roles.map(r => r.name), finalRoleResponses, finalSynthesis);
     }
 
-    // Save to history
-    saveToHistory('dxo', prompt, state.roles.length, state.roles.map(r => r.name), finalRoleResponses, finalSynthesis);
-}
-
 async function synthesizeDxO(originalPrompt, responses, round = 1, totalRounds = 1) {
-    const synthesisPanel = document.getElementById('synthesis-panel');
-    const synthesisContent = document.getElementById('synthesis-content');
-    synthesisPanel.classList.remove('hidden');
-    synthesisContent.innerHTML = '<span class="cursor"></span>';
+        const synthesisPanel = document.getElementById('synthesis-panel');
+        const synthesisContent = document.getElementById('synthesis-content');
+        synthesisPanel.classList.remove('hidden');
+        synthesisContent.innerHTML = '<span class="cursor"></span>';
 
-    const responseSummary = Object.entries(responses).map(([roleName, data]) => {
-        return `## ${roleName} (${data.role.perspective}):\n${data.response}`;
-    }).join('\n\n---\n\n');
+        const responseSummary = Object.entries(responses).map(([roleName, data]) => {
+            return `## ${roleName} (${data.role.perspective}):\n${data.response}`;
+        }).join('\n\n---\n\n');
 
-    const isFinalRound = round === totalRounds;
-    const synthesisPrompt = `You are synthesizing a multi-perspective analysis from a DxO Decision Orchestrator session.
+        const isFinalRound = round === totalRounds;
+        const synthesisPrompt = `You are synthesizing a multi-perspective analysis from a DxO Decision Orchestrator session.
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
 
 **Original Problem:** ${originalPrompt}
@@ -1443,121 +1590,121 @@ ${isFinalRound ? '4. **Provides Actionable Recommendations** based on the combin
 
 Be structured and thorough. This synthesis should be more valuable than any single perspective alone.`;
 
-    let synthesisText = '';
-    const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
+        let synthesisText = '';
+        const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
 
-    try {
-        const reader = await streamResponse(chairmanModel, synthesisPrompt);
-        await processStream(
-            reader,
-            (chunk, full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-            },
-            (full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full);
-            }
-        );
-    } catch (error) {
-        synthesisText = `Error generating synthesis: ${error.message}`;
-        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        try {
+            const reader = await streamResponse(chairmanModel, synthesisPrompt);
+            await processStream(
+                reader,
+                (chunk, full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+                },
+                (full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                }
+            );
+        } catch (error) {
+            synthesisText = `Error generating synthesis: ${error.message}`;
+            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        }
+        return synthesisText;
     }
-    return synthesisText;
-}
 
 // ============================================
 // ENSEMBLE MODE
 // ============================================
 
 async function startEnsemble(isContinue = false) {
-    const prompt = document.getElementById('ensemble-prompt').value.trim();
-    if (!prompt) {
-        alert('Please enter a question or topic.');
-        return;
+        const prompt = document.getElementById('ensemble-prompt').value.trim();
+        if (!prompt) {
+            alert('Please enter a question or topic.');
+            return;
+        }
+
+        if (state.selectedEnsembleModels.length < 2) {
+            alert('Please select at least 2 models for the ensemble.');
+            return;
+        }
+
+        const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('ensemble-rounds')?.value || 1);
+        const existingSynthesis = document.getElementById('synthesis-content').textContent;
+
+        if (!isContinue) showResults('Ensemble Analysis');
+        else document.getElementById('results-panel').classList.remove('hidden');
+
+        let currentContext = isContinue ? existingSynthesis : '';
+        let finalAnonymousResponses = {};
+        let finalSynthesis = '';
+
+        for (let round = 1; round <= roundsToRun; round++) {
+            const displayRound = isContinue ? 'Continuation' : round;
+            const roundTitle = !isContinue && roundsToRun > 1 ? ` (Round ${round}/${roundsToRun})` : (isContinue ? ' (Continuation)' : '');
+            document.getElementById('results-title').textContent = `Ensemble${roundTitle}`;
+
+            const anonymousResponses = {};
+            const responsesContainer = document.getElementById('model-responses');
+            if (round === 1) responsesContainer.innerHTML = '';
+
+            // Shuffle models once at the start of the session to keep labels consistent
+            const shuffledModels = [...state.selectedEnsembleModels];
+            if (round === 1) shuffledModels.sort(() => Math.random() - 0.5);
+
+            const promises = shuffledModels.map(async (modelId, index) => {
+                const anonName = ANONYMOUS_NAMES[index] || `Agent ${index + 1}`;
+                const cardId = `${anonName.toLowerCase()}-round-${round}`;
+
+                const cardHtml = createResponseCard(anonName, 'Anonymous Perspective', cardId, anonName.toLowerCase());
+                responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
+
+                if (index > 0) await sleep(index * 1000);
+
+                let systemPrompt = `Provide your analysis and perspective on the following question. Be thorough, insightful, and focused on substance. Your response will be anonymized for unbiased evaluation.`;
+
+                if (round > 1) {
+                    systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the collective synthesis, refine your position or address any specific critiques.`;
+                }
+
+                try {
+                    const reader = await streamResponse(modelId, prompt, systemPrompt, state.attachments.ensemble);
+                    await processStream(
+                        reader,
+                        (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
+                        (full) => {
+                            anonymousResponses[anonName] = full;
+                            updateResponseCard(cardId, full, 'complete');
+                        }
+                    );
+                } catch (error) {
+                    updateResponseCard(cardId, `Error: ${error.message}`, 'error');
+                }
+            });
+
+            await Promise.all(promises);
+
+            finalAnonymousResponses = { ...finalAnonymousResponses, ...anonymousResponses };
+            finalSynthesis = await synthesizeEnsemble(prompt, anonymousResponses, round, totalRounds);
+            currentContext = finalSynthesis;
+        }
+
+        saveToHistory('ensemble', prompt, state.selectedEnsembleModels.length, null, finalAnonymousResponses, finalSynthesis);
     }
-
-    if (state.selectedEnsembleModels.length < 2) {
-        alert('Please select at least 2 models for the ensemble.');
-        return;
-    }
-
-    const roundsToRun = isContinue ? 1 : parseInt(document.getElementById('ensemble-rounds')?.value || 1);
-    const existingSynthesis = document.getElementById('synthesis-content').textContent;
-
-    if (!isContinue) showResults('Ensemble Analysis');
-    else document.getElementById('results-panel').classList.remove('hidden');
-
-    let currentContext = isContinue ? existingSynthesis : '';
-    let finalAnonymousResponses = {};
-    let finalSynthesis = '';
-
-    for (let round = 1; round <= roundsToRun; round++) {
-        const displayRound = isContinue ? 'Continuation' : round;
-        const roundTitle = !isContinue && roundsToRun > 1 ? ` (Round ${round}/${roundsToRun})` : (isContinue ? ' (Continuation)' : '');
-        document.getElementById('results-title').textContent = `Ensemble${roundTitle}`;
-
-        const anonymousResponses = {};
-        const responsesContainer = document.getElementById('model-responses');
-        if (round === 1) responsesContainer.innerHTML = '';
-
-        // Shuffle models once at the start of the session to keep labels consistent
-        const shuffledModels = [...state.selectedEnsembleModels];
-        if (round === 1) shuffledModels.sort(() => Math.random() - 0.5);
-
-        const promises = shuffledModels.map(async (modelId, index) => {
-            const anonName = ANONYMOUS_NAMES[index] || `Agent ${index + 1}`;
-            const cardId = `${anonName.toLowerCase()}-round-${round}`;
-
-            const cardHtml = createResponseCard(anonName, 'Anonymous Perspective', cardId, anonName.toLowerCase());
-            responsesContainer.insertAdjacentHTML('beforeend', cardHtml);
-
-            if (index > 0) await sleep(index * 1000);
-
-            let systemPrompt = `Provide your analysis and perspective on the following question. Be thorough, insightful, and focused on substance. Your response will be anonymized for unbiased evaluation.`;
-
-            if (round > 1) {
-                systemPrompt += `\n\n**Previous Iteration Synthesis:**\n${currentContext}\n\nBased on the collective synthesis, refine your position or address any specific critiques.`;
-            }
-
-            try {
-                const reader = await streamResponse(modelId, prompt, systemPrompt, state.attachments.ensemble);
-                await processStream(
-                    reader,
-                    (chunk, full) => updateResponseCard(cardId, full, 'streaming'),
-                    (full) => {
-                        anonymousResponses[anonName] = full;
-                        updateResponseCard(cardId, full, 'complete');
-                    }
-                );
-            } catch (error) {
-                updateResponseCard(cardId, `Error: ${error.message}`, 'error');
-            }
-        });
-
-        await Promise.all(promises);
-
-        finalAnonymousResponses = { ...finalAnonymousResponses, ...anonymousResponses };
-        finalSynthesis = await synthesizeEnsemble(prompt, anonymousResponses, round, totalRounds);
-        currentContext = finalSynthesis;
-    }
-
-    saveToHistory('ensemble', prompt, state.selectedEnsembleModels.length, null, finalAnonymousResponses, finalSynthesis);
-}
 
 async function synthesizeEnsemble(originalPrompt, responses, round = 1, totalRounds = 1) {
-    const synthesisPanel = document.getElementById('synthesis-panel');
-    const synthesisContent = document.getElementById('synthesis-content');
-    synthesisPanel.classList.remove('hidden');
+        const synthesisPanel = document.getElementById('synthesis-panel');
+        const synthesisContent = document.getElementById('synthesis-content');
+        synthesisPanel.classList.remove('hidden');
 
-    const responseSummary = Object.entries(responses).map(([anonName, response]) => {
-        return `## Agent ${anonName}:\n${response}`;
-    }).join('\n\n---\n\n');
+        const responseSummary = Object.entries(responses).map(([anonName, response]) => {
+            return `## Agent ${anonName}:\n${response}`;
+        }).join('\n\n---\n\n');
 
-    const isFinalRound = round === totalRounds;
-    const synthesisPrompt = `You are synthesizing responses from multiple anonymous AI agents. Focus purely on the substance and quality of arguments, not on who said what.
+        const isFinalRound = round === totalRounds;
+        const synthesisPrompt = `You are synthesizing responses from multiple anonymous AI agents. Focus purely on the substance and quality of arguments, not on who said what.
 ${totalRounds > 1 ? `**Current Round:** ${round} of ${totalRounds}` : ''}
 
 **Original Question:** ${originalPrompt}
@@ -1574,74 +1721,74 @@ Create an unbiased ${isFinalRound ? 'FINAL' : 'INTERMEDIATE'} synthesis that:
 
 Remember: Focus on the quality of reasoning, not the source. This is anonymous collective intelligence.`;
 
-    let synthesisText = '';
-    const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
+        let synthesisText = '';
+        const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
 
-    try {
-        const reader = await streamResponse(chairmanModel, synthesisPrompt);
-        await processStream(
-            reader,
-            (chunk, full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
-            },
-            (full) => {
-                synthesisText = full;
-                const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
-                synthesisContent.innerHTML = roundText + formatMarkdown(full);
-            }
-        );
-    } catch (error) {
-        synthesisText = `Error generating synthesis: ${error.message}`;
-        synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        try {
+            const reader = await streamResponse(chairmanModel, synthesisPrompt);
+            await processStream(
+                reader,
+                (chunk, full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full) + '<span class="cursor"></span>';
+                },
+                (full) => {
+                    synthesisText = full;
+                    const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
+                    synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                }
+            );
+        } catch (error) {
+            synthesisText = `Error generating synthesis: ${error.message}`;
+            synthesisContent.innerHTML = `<p style="color: #ef4444;">${synthesisText}</p>`;
+        }
+        return synthesisText;
     }
-    return synthesisText;
-}
 
 // ============================================
 // SUPER CHAT MODE
 // ============================================
 
 async function startSuperChat() {
-    const prompt = document.getElementById('superchat-prompt').value.trim();
-    if (!prompt) {
-        alert('Please enter a message.');
-        return;
+        const prompt = document.getElementById('superchat-prompt').value.trim();
+        if (!prompt) {
+            alert('Please enter a message.');
+            return;
+        }
+
+        const modelId = document.getElementById('superchat-model').value;
+        const model = findModelById(modelId);
+
+        showResults('Super Chat');
+
+        const responsesContainer = document.getElementById('model-responses');
+        responsesContainer.innerHTML = createResponseCard(model.name, model.provider, 'superchat');
+
+        // Hide synthesis panel for super chat
+        document.getElementById('synthesis-panel').classList.add('hidden');
+
+        try {
+            const reader = await streamResponse(modelId, prompt, '', state.attachments.superchat);
+            await processStream(
+                reader,
+                (chunk, full) => updateResponseCard('superchat', full, 'streaming'),
+                (full) => {
+                    updateResponseCard('superchat', full, 'complete');
+                    saveToHistory('superchat', prompt, 1);
+                }
+            );
+        } catch (error) {
+            updateResponseCard('superchat', `Error: ${error.message}`, 'error');
+        }
     }
-
-    const modelId = document.getElementById('superchat-model').value;
-    const model = findModelById(modelId);
-
-    showResults('Super Chat');
-
-    const responsesContainer = document.getElementById('model-responses');
-    responsesContainer.innerHTML = createResponseCard(model.name, model.provider, 'superchat');
-
-    // Hide synthesis panel for super chat
-    document.getElementById('synthesis-panel').classList.add('hidden');
-
-    try {
-        const reader = await streamResponse(modelId, prompt, '', state.attachments.superchat);
-        await processStream(
-            reader,
-            (chunk, full) => updateResponseCard('superchat', full, 'streaming'),
-            (full) => {
-                updateResponseCard('superchat', full, 'complete');
-                saveToHistory('superchat', prompt, 1);
-            }
-        );
-    } catch (error) {
-        updateResponseCard('superchat', `Error: ${error.message}`, 'error');
-    }
-}
 
 // ============================================
 // UI HELPERS
 // ============================================
 
 function createResponseCard(name, subtitle, id, avatarClass = '') {
-    return `
+        return `
         <div class="response-card" id="response-${id}">
             <div class="response-header">
                 <div class="response-avatar ${avatarClass}">${name.charAt(0)}</div>
@@ -1656,85 +1803,85 @@ function createResponseCard(name, subtitle, id, avatarClass = '') {
             </div>
         </div>
     `;
-}
+    }
 
 function updateResponseCard(id, content, status) {
-    const contentEl = document.getElementById(`content-${id}`);
-    const statusEl = document.getElementById(`status-${id}`);
+        const contentEl = document.getElementById(`content-${id}`);
+        const statusEl = document.getElementById(`status-${id}`);
 
-    if (contentEl) {
-        if (status === 'streaming') {
-            contentEl.innerHTML = formatMarkdown(content) + '<span class="cursor"></span>';
-        } else {
-            contentEl.innerHTML = formatMarkdown(content);
+        if (contentEl) {
+            if (status === 'streaming') {
+                contentEl.innerHTML = formatMarkdown(content) + '<span class="cursor"></span>';
+            } else {
+                contentEl.innerHTML = formatMarkdown(content);
+            }
+        }
+
+        if (statusEl) {
+            if (status === 'complete') {
+                statusEl.textContent = 'Complete';
+                statusEl.className = 'response-status complete';
+            } else if (status === 'error') {
+                statusEl.textContent = 'Error';
+                statusEl.className = 'response-status error';
+            }
         }
     }
-
-    if (statusEl) {
-        if (status === 'complete') {
-            statusEl.textContent = 'Complete';
-            statusEl.className = 'response-status complete';
-        } else if (status === 'error') {
-            statusEl.textContent = 'Error';
-            statusEl.className = 'response-status error';
-        }
-    }
-}
 
 function formatMarkdown(text) {
-    if (!text) return '';
+        if (!text) return '';
 
-    // Basic markdown formatting
-    let html = text
-        // Headers
-        .replace(/^### (.*$)/gm, '<h4>$1</h4>')
-        .replace(/^## (.*$)/gm, '<h4>$1</h4>')
-        .replace(/^# (.*$)/gm, '<h3>$1</h3>')
-        // Bold
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Italic
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        // Code blocks
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-        // Inline code
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        // Lists
-        .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
-        .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li>$2</li>')
-        // Paragraphs
-        .replace(/\n\n/g, '</p><p>')
-        // Line breaks
-        .replace(/\n/g, '<br>');
+        // Basic markdown formatting
+        let html = text
+            // Headers
+            .replace(/^### (.*$)/gm, '<h4>$1</h4>')
+            .replace(/^## (.*$)/gm, '<h4>$1</h4>')
+            .replace(/^# (.*$)/gm, '<h3>$1</h3>')
+            // Bold
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            // Italic
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Code blocks
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+            // Inline code
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            // Lists
+            .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
+            .replace(/^\s*(\d+)\.\s+(.*)$/gm, '<li>$2</li>')
+            // Paragraphs
+            .replace(/\n\n/g, '</p><p>')
+            // Line breaks
+            .replace(/\n/g, '<br>');
 
-    // Wrap in paragraph tags
-    html = '<p>' + html + '</p>';
+        // Wrap in paragraph tags
+        html = '<p>' + html + '</p>';
 
-    // Clean up empty paragraphs
-    html = html.replace(/<p><\/p>/g, '');
+        // Clean up empty paragraphs
+        html = html.replace(/<p><\/p>/g, '');
 
-    // Wrap consecutive li elements in ul
-    html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
+        // Wrap consecutive li elements in ul
+        html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
 
-    return html;
-}
+        return html;
+    }
 
 function showResults(title) {
-    document.getElementById('results-title').textContent = title;
-    document.getElementById('results-panel').classList.remove('hidden');
-    document.getElementById('synthesis-panel').classList.add('hidden');
-    document.getElementById('model-responses').innerHTML = '';
-}
+        document.getElementById('results-title').textContent = title;
+        document.getElementById('results-panel').classList.remove('hidden');
+        document.getElementById('synthesis-panel').classList.add('hidden');
+        document.getElementById('model-responses').innerHTML = '';
+    }
 
 function closeResults() {
-    document.getElementById('results-panel').classList.add('hidden');
-}
+        document.getElementById('results-panel').classList.add('hidden');
+    }
 
 // Store current results for copy/export
 let currentResults = {
-    title: '',
-    responses: {},
-    synthesis: ''
-};
+        title: '',
+        responses: {},
+        synthesis: ''
+    };
 
 function copyAllResults() {
     const title = document.getElementById('results-title').textContent;

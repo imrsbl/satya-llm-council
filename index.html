@@ -735,6 +735,7 @@
                         <div class="export-menu hidden" id="export-menu">
                             <button onclick="exportCurrentResults()">📄 Markdown</button>
                             <button onclick="exportAsPDF()">📑 PDF</button>
+                            <button onclick="sendToNotion()">🚀 Send to Notion</button>
                             <button onclick="generateShareableLink()">🔗 Share Link</button>
                         </div>
                     </div>
@@ -903,6 +904,22 @@
                                 placeholder="http://localhost:11434/v1" value="http://localhost:11434/v1">
                             <p class="setting-hint">Supports Ollama (port 11434) or LM Studio (port 1234).</p>
                         </div>
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label">Notion Integration (Export)</label>
+                        <div class="notion-settings-grid" style="display: grid; gap: 10px; margin-top: 10px;">
+                            <div>
+                                <label class="card-label">Notion API Key</label>
+                                <input type="password" id="notion-api-key" class="setting-input"
+                                    placeholder="secret_...">
+                            </div>
+                            <div>
+                                <label class="card-label">Notion Database ID</label>
+                                <input type="text" id="notion-db-id" class="setting-input" placeholder="32-char ID">
+                            </div>
+                        </div>
+                        <p class="setting-hint">Create an integration at developers.notion.com and share your database
+                            with it.</p>
                     </div>
                     <button class="primary-btn" onclick="saveSettings()">Save Settings</button>
                 </div>

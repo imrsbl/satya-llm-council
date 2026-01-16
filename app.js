@@ -160,6 +160,12 @@ let filterState = {
     ensemble: { search: '', tags: [] }
 };
 
+// Notion Integration State
+let notionState = {
+    apiKey: '',
+    databaseId: ''
+};
+
 // Helper function to find model across ALL model arrays
 function findModelById(modelId) {
     return MODELS.find(m => m.id === modelId) ||
@@ -282,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPresetDropdowns();
     loadLeaderboardData();
     renderRandomQuickPrompts();
+    loadApiKey();
 });
 
 // ============================================
@@ -1385,6 +1392,9 @@ async function startCouncil(isContinue = false) {
     }
 
     saveToHistory('council', originalPrompt, state.selectedCouncilModels.length, null, finalModelResponses, finalSynthesis);
+
+    // Auto-send to Notion if configured
+    autoSendToNotion();
 }
 
 async function synthesizeCouncil(chairmanModel, originalPrompt, responses, round = 1, totalRounds = 1) {
@@ -1414,6 +1424,12 @@ Your task is to synthesize these perspectives into a comprehensive ${isFinalRoun
 3. **Synthesis** - Your integrated analysis
 ${isFinalRound ? '4. **Actionable Recommendations** - Clear next steps' : '4. **Missing Information / Targeted Research** - What should we focus on in the next round?'}
 
+${isFinalRound ? `---
+METADATA_START
+TAGS: [3-5 comma separated tags, e.g. eth, de-fi, scaling]
+SUMMARY: [1-2 sentence key takeaway for notes]
+METADATA_END` : ''}
+
 Be thorough but organized. Highlight the most valuable insights from each council member.`;
 
     let synthesisText = '';
@@ -1430,6 +1446,7 @@ Be thorough but organized. Highlight the most valuable insights from each counci
                 synthesisText = full;
                 const roundText = totalRounds > 1 ? `<h4>Synthesis - Round ${round}</h4>` : '';
                 synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                if (isFinalRound) autoFillMetadata(full);
             }
         );
     } catch (error) {
@@ -1523,6 +1540,9 @@ Your instructions: ${role.instructions}`;
 
     // Save to history
     saveToHistory('dxo', prompt, state.roles.length, state.roles.map(r => r.name), finalRoleResponses, finalSynthesis);
+
+    // Auto-send to Notion if configured
+    autoSendToNotion();
 }
 
 async function synthesizeDxO(originalPrompt, responses, round = 1, totalRounds = 1) {
@@ -1550,7 +1570,13 @@ Create a comprehensive ${isFinalRound ? 'FINAL' : 'INTERMEDIATE'} synthesis that
 3. **Resolves Tensions** where perspectives conflict
 ${isFinalRound ? '4. **Provides Actionable Recommendations** based on the combined analysis' : '4. **Targeted Questions** - What specific points should the roles address in the next round?'}
 
-Be structured and thorough. This synthesis should be more valuable than any single perspective alone.`;
+${isFinalRound ? `---
+METADATA_START
+TAGS: [3-5 comma separated tags, e.g. risk, strategy, growth]
+SUMMARY: [1-2 sentence key takeaway for notes]
+METADATA_END` : ''}
+
+Be thorough and structured. This synthesis should be more valuable than any single perspective alone.`;
 
     let synthesisText = '';
     const chairmanModel = document.getElementById('chairman-select')?.value || MODELS[0].id;
@@ -1568,6 +1594,7 @@ Be structured and thorough. This synthesis should be more valuable than any sing
                 synthesisText = full;
                 const roundText = totalRounds > 1 ? `<h4>DxO Synthesis - Round ${round}</h4>` : '';
                 synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                if (isFinalRound) autoFillMetadata(full);
             }
         );
     } catch (error) {
@@ -1654,6 +1681,9 @@ async function startEnsemble(isContinue = false) {
     }
 
     saveToHistory('ensemble', prompt, state.selectedEnsembleModels.length, null, finalAnonymousResponses, finalSynthesis);
+
+    // Auto-send to Notion if configured
+    autoSendToNotion();
 }
 
 async function synthesizeEnsemble(originalPrompt, responses, round = 1, totalRounds = 1) {
@@ -1679,7 +1709,13 @@ Create an unbiased ${isFinalRound ? 'FINAL' : 'INTERMEDIATE'} synthesis that:
 2. **Highlights Unique Insights** each agent contributed
 3. **Notes Agreement Areas** where agents converge
 4. **Resolves Disagreements** based on argument strength
-5. **Provides ${isFinalRound ? 'Final Recommendation' : 'Topics for Iterative Refinement'}** synthesizing the best elements
+${isFinalRound ? '5. **Final Recommendation** - Synthesizing the best elements' : '5. **Topics for Iterative Refinement**'}
+
+${isFinalRound ? `---
+METADATA_START
+TAGS: [3-5 comma separated tags]
+SUMMARY: [1-2 sentence key takeaway for notes]
+METADATA_END` : ''}
 
 Remember: Focus on the quality of reasoning, not the source. This is anonymous collective intelligence.`;
 
@@ -1699,6 +1735,7 @@ Remember: Focus on the quality of reasoning, not the source. This is anonymous c
                 synthesisText = full;
                 const roundText = totalRounds > 1 ? `<h4>Ensemble Synthesis - Round ${round}</h4>` : '';
                 synthesisContent.innerHTML = roundText + formatMarkdown(full);
+                if (isFinalRound) autoFillMetadata(full);
             }
         );
     } catch (error) {
@@ -1738,6 +1775,8 @@ async function startSuperChat() {
             (full) => {
                 updateResponseCard('superchat', full, 'complete');
                 saveToHistory('superchat', prompt, 1);
+                // Auto-send to Notion if configured
+                autoSendToNotion();
             }
         );
     } catch (error) {
@@ -1787,6 +1826,24 @@ function updateResponseCard(id, content, status) {
             statusEl.textContent = 'Error';
             statusEl.className = 'response-status error';
         }
+    }
+}
+
+function autoFillMetadata(synthesisText) {
+    if (!synthesisText) return;
+
+    // Extract Tags
+    const tagsMatch = synthesisText.match(/TAGS:\s*\[?([^\]\n]+)\]?/i);
+    if (tagsMatch && tagsMatch[1]) {
+        const tagsInput = document.getElementById('session-tags');
+        if (tagsInput) tagsInput.value = tagsMatch[1].trim().replace(/[\[\]]/g, '');
+    }
+
+    // Extract Summary/Notes
+    const summaryMatch = synthesisText.match(/SUMMARY:\s*\[?([^\]\n]+)\]?/i);
+    if (summaryMatch && summaryMatch[1]) {
+        const notesInput = document.getElementById('session-notes');
+        if (notesInput) notesInput.value = summaryMatch[1].trim().replace(/[\[\]]/g, '');
     }
 }
 
@@ -1911,14 +1968,135 @@ function exportCurrentResults() {
         markdown += `${synthesisContent.innerText}\n`;
     }
 
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    a.download = `satya-${sanitizedTitle}-${Date.now()}.md`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+async function sendToNotion() {
+    const apiKey = localStorage.getItem('satya_notion_api_key');
+    const databaseId = localStorage.getItem('satya_notion_db_id');
+
+    if (!apiKey || !databaseId) {
+        alert('Please configure Notion API Key and Database ID in Settings first.');
+        showSettings();
+        return;
+    }
+
+    const title = document.getElementById('results-title').textContent;
+    const tags = document.getElementById('session-tags').value.split(',').map(t => t.trim()).filter(t => t !== '');
+    const notes = document.getElementById('session-notes').value.trim();
+
+    // Get synthesis
+    const synthesisContent = document.getElementById('synthesis-content').innerText;
+
+    // Get responses
+    const responseCards = document.querySelectorAll('#model-responses .response-card');
+    const responses = Array.from(responseCards).map(card => {
+        const name = card.querySelector('.response-header h4')?.textContent || 'Agent';
+        const content = card.querySelector('.response-content')?.innerText || '';
+        return { name, content };
+    });
+
+    showCopyFeedback('Sending to Notion...');
+
+    // Notion API via CORS Proxy
+    const proxyUrl = 'https://corsproxy.io/?';
+    const notionUrl = 'https://api.notion.com/v1/pages';
+
+    const body = {
+        parent: { database_id: databaseId },
+        properties: {
+            Name: {
+                title: [{ text: { content: title } }]
+            },
+            Mode: {
+                select: { name: title.split(' ')[0] }
+            },
+            Tags: {
+                multi_select: tags.map(tag => ({ name: tag.trim().replace(/,/g, '') }))
+            },
+            Date: {
+                date: { start: new Date().toISOString() }
+            }
+        },
+        children: [
+            {
+                object: 'block',
+                type: 'heading_2',
+                heading_2: { rich_text: [{ text: { content: '✨ Final Synthesis' } }] }
+            },
+            {
+                object: 'block',
+                type: 'paragraph',
+                paragraph: { rich_text: [{ text: { content: synthesisContent.substring(0, 2000) } }] }
+            }
+        ]
+    };
+
+    // Add responses as blocks
+    if (responses.length > 0) {
+        body.children.push({
+            object: 'block',
+            type: 'heading_2',
+            heading_2: { rich_text: [{ text: { content: 'Council Responses' } }] }
+        });
+
+        responses.forEach(r => {
+            body.children.push({
+                object: 'block',
+                type: 'heading_3',
+                heading_3: { rich_text: [{ text: { content: r.name } }] }
+            });
+            body.children.push({
+                object: 'block',
+                type: 'paragraph',
+                paragraph: { rich_text: [{ text: { content: r.content.substring(0, 2000) } }] }
+            });
+        });
+    }
+
+    try {
+        const response = await fetch(proxyUrl + encodeURIComponent(notionUrl), {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (response.ok) {
+            showCopyFeedback('Success! Saved to Notion.');
+        } else {
+            const errorData = await response.json();
+            console.error('Notion Error:', errorData);
+            alert(`Notion Transfer Failed: ${errorData.message || 'Check your API Key and Database ID'}`);
+        }
+    } catch (err) {
+        console.error('Fetch Error:', err);
+        alert('Network error or CORS issue. Please check your connection.');
+    }
+}
+
+// Auto-send to Notion (silent - only sends if credentials are configured)
+async function autoSendToNotion() {
+    const apiKey = localStorage.getItem('satya_notion_api_key');
+    const databaseId = localStorage.getItem('satya_notion_db_id');
+
+    // Only auto-send if both credentials are configured
+    if (!apiKey || !databaseId) {
+        return; // Silently skip if not configured
+    }
+
+    // Small delay to ensure DOM is updated
+    setTimeout(async () => {
+        try {
+            await sendToNotion();
+        } catch (err) {
+            console.error('Auto-send to Notion failed:', err);
+        }
+    }, 500);
 }
 
 function showCopyFeedback(message) {
@@ -2216,6 +2394,11 @@ function loadApiKey() {
     if (savedKey) {
         document.getElementById('api-key-input').value = savedKey;
     }
+
+    const notionKey = localStorage.getItem('satya_notion_api_key');
+    const notionDb = localStorage.getItem('satya_notion_db_id');
+    if (notionKey) document.getElementById('notion-api-key').value = notionKey;
+    if (notionDb) document.getElementById('notion-db-id').value = notionDb;
 }
 
 function saveSettings() {
@@ -2225,8 +2408,18 @@ function saveSettings() {
     } else {
         localStorage.removeItem('satya_api_key');
     }
+
+    const notionKey = document.getElementById('notion-api-key').value.trim();
+    const notionDb = document.getElementById('notion-db-id').value.trim();
+
+    if (notionKey) localStorage.setItem('satya_notion_api_key', notionKey);
+    else localStorage.removeItem('satya_notion_api_key');
+
+    if (notionDb) localStorage.setItem('satya_notion_db_id', notionDb);
+    else localStorage.removeItem('satya_notion_db_id');
+
     closeSettings();
-    alert('Settings saved!');
+    showCopyFeedback('Settings saved!');
 }
 
 // ============================================

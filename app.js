@@ -273,8 +273,40 @@ let state = {
     showAllModels: false,
     showAllModelsEnsemble: false,
     // Firebase auth
-    currentUser: null
+    currentUser: null,
+    // Minimalist Mode for Android Apps (Satya Lite / Satya Pro)
+    minimalistMode: null, // 'lite' | 'pro' | null
+    chatHistory: [] // For minimalist chat UI
 };
+
+// ============================================
+// PREMIUM COUNCIL CONFIGURATION (Satya Pro)
+// ============================================
+const PREMIUM_COUNCIL_MODELS = [
+    'openai/gpt-5.2-pro',
+    'google/gemini-3-flash-preview',
+    'x-ai/grok-4.1-fast'
+];
+const PREMIUM_CHAIR = 'anthropic/claude-sonnet-4.5';
+
+// ============================================
+// MINIMALIST MODE DETECTION
+// ============================================
+function detectMinimalistMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+
+    if (mode === 'lite' || mode === 'pro') {
+        state.minimalistMode = mode;
+        console.log(`🎯 Minimalist Mode: ${mode}`);
+        return mode;
+    }
+    return null;
+}
+
+// Initialize minimalist mode on page load
+detectMinimalistMode();
+
 
 
 
@@ -3532,17 +3564,6 @@ document.addEventListener('click', function (e) {
 }, true);
 
 // Additional comprehensive function exposures
-window.viewHistoryItem = viewHistoryItem;
-window.exportHistoryItem = exportHistoryItem;
-window.historyFilterMode = historyFilterMode;
-window.switchTab = switchTab;
-window.toggleProfilePanel = toggleProfilePanel;
-window.showHistory = showHistory;
-window.closeHistory = closeHistory;
-window.logout = logout;
-
-console.log('🚀 Satya App v126 Core Loaded');
-
 // FINAL COMPREHENSIVE WINDOW EXPOSURE
 Object.assign(window, {
     showSettings, closeSettings, showHistory, closeHistory,
@@ -3550,7 +3571,368 @@ Object.assign(window, {
     continueSession, sendToNotion, startCouncil, selectModel,
     toggleUltraFreeMode, viewHistoryItem, exportHistoryItem,
     switchTab, toggleProfilePanel, logout, triggerPhotoUpload,
-    handlePhotoUpload, saveProfileSettings, autoPopulateSessionMeta
+    handlePhotoUpload, saveProfileSettings, autoPopulateSessionMeta,
+    startDxO, startEnsemble, startSuperChat, startBenchmark,
+    addRole, deleteRole, toggleFilter, filterCouncilModels,
+    filterEnsembleModels, toggleBenchmarkSelection, selectBenchmark,
+    toggleFreeMode, toggleExportMenu, exportAsPDF, generateShareableLink,
+    saveSessionMeta, formatMarkdown, closeResults
 });
 
-console.log('🚀 Satya App v126.1 - All Systems Go');
+console.log('🚀 Satya App v126.3 - Global APIs Exposed');
+
+// ============================================
+// INVISIBLE COUNCIL MODE (Satya Lite / Pro)
+// ============================================
+
+/**
+ * Helper to pick random models from ULTRA_FREE pool
+ */
+function pickRandomModels(count = 5) {
+    const shuffled = [...ULTRA_FREE_MODELS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count).map(m => m.id);
+}
+
+/**
+ * Pick a random best chair from top free models
+ */
+function pickRandomChair() {
+    const topChairs = [
+        'nousresearch/hermes-3-llama-3.1-405b:free', // 405B reasoning
+        'deepseek/deepseek-r1-0528:free', // DeepSeek R1
+        'openai/gpt-oss-120b:free', // GPT-OSS
+        'qwen/qwen3-coder:free' // Qwen3 Coder
+    ];
+    return topChairs[Math.floor(Math.random() * topChairs.length)];
+}
+
+/**
+ * Run Invisible Council - for Android apps
+ * Models deliberate in background, user only sees final synthesis
+ * @param {string} prompt - User's input
+ * @param {string} mode - 'lite' (random free) or 'pro' (premium fixed)
+ */
+async function runInvisibleCouncil(prompt, mode = 'lite') {
+    const isPro = mode === 'pro';
+
+    // Select models based on mode
+    const councilModels = isPro ? PREMIUM_COUNCIL_MODELS : pickRandomModels(5);
+    const chairModel = isPro ? PREMIUM_CHAIR : pickRandomChair();
+
+    console.log(`🎭 Invisible Council [${mode}]:`, councilModels, `Chair: ${chairModel}`);
+
+    // Update UI to show "thinking" state
+    addMinimalistMessage('assistant', '⏳ Thinking...', true);
+
+    const modelResponses = {};
+
+    // Run council deliberation in parallel (silently)
+    const promises = councilModels.map(async (modelId) => {
+        const systemPrompt = `You are a member of an AI council. Provide your expert analysis on the user's question. Focus on accuracy, edge cases, and verifiable facts. Be concise but thorough.`;
+
+        try {
+            const reader = await streamResponse(modelId, prompt, systemPrompt, []);
+            let fullResponse = '';
+
+            await processStream(
+                reader,
+                (chunk, full) => { fullResponse = full; },
+                (full) => { modelResponses[modelId] = full; }
+            );
+        } catch (error) {
+            console.error(`Error from ${modelId}:`, error.message);
+            modelResponses[modelId] = `[Error: ${error.message}]`;
+        }
+    });
+
+    await Promise.all(promises);
+
+    // Run synthesis with chairman
+    const synthesisPrompt = `You are the Chairman of an AI Council. Below are perspectives from ${councilModels.length} different AI models on the user's question.
+
+USER'S QUESTION: ${prompt}
+
+COUNCIL RESPONSES:
+${Object.entries(modelResponses).map(([model, response], i) =>
+        `\n--- Perspective ${i + 1} ---\n${response}`
+    ).join('\n')}
+
+YOUR TASK:
+Synthesize these perspectives into a single, coherent, and comprehensive response. 
+- Identify points of consensus
+- Resolve any contradictions with the most accurate interpretation
+- Provide a clear, actionable answer to the user's question
+- Be conversational and helpful, like ChatGPT
+
+Do NOT mention that you are synthesizing from multiple sources. Respond as a single unified assistant.`;
+
+    try {
+        const reader = await streamResponse(chairModel, synthesisPrompt,
+            'You are a helpful AI assistant. Respond naturally and conversationally.', []);
+
+        let finalSynthesis = '';
+
+        // Remove the "thinking" message
+        removeThinkingMessage();
+
+        // Add assistant response placeholder
+        const assistantMsgId = addMinimalistMessage('assistant', '', false);
+
+        await processStream(
+            reader,
+            (chunk, full) => {
+                updateMinimalistMessage(assistantMsgId, full);
+            },
+            (full) => {
+                finalSynthesis = full;
+                state.chatHistory.push({ role: 'assistant', content: full });
+            }
+        );
+
+        return finalSynthesis;
+    } catch (error) {
+        removeThinkingMessage();
+        const errorMsg = `Sorry, I encountered an error: ${error.message}`;
+        addMinimalistMessage('assistant', errorMsg, false);
+        return errorMsg;
+    }
+}
+
+/**
+ * Initialize Minimalist Chat UI (for Android apps)
+ */
+function initMinimalistUI() {
+    if (!state.minimalistMode) return;
+
+    // Hide all normal UI
+    document.body.innerHTML = `
+    <div id="minimalist-app" class="minimalist-container">
+        <div class="minimalist-header">
+            <div class="minimalist-title">
+                <span class="minimalist-logo">✨</span>
+                ${state.minimalistMode === 'pro' ? 'Satya Pro' : 'Satya'}
+            </div>
+            <span class="minimalist-badge">${state.minimalistMode === 'pro' ? 'Premium' : 'Council'}</span>
+        </div>
+        
+        <div id="minimalist-chat" class="minimalist-chat">
+            <div class="welcome-message">
+                <div class="welcome-icon">👋</div>
+                <h2>Hello!</h2>
+                <p>Ask me anything. ${state.minimalistMode === 'pro'
+            ? 'Powered by GPT-5.2, Gemini 3, Grok 4.1 & Claude.'
+            : 'Multiple AI perspectives working together for you.'}</p>
+            </div>
+        </div>
+        
+        <div class="minimalist-input-container">
+            <textarea 
+                id="minimalist-input" 
+                placeholder="Type your message..." 
+                rows="1"
+                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMinimalistMessage(); }"
+            ></textarea>
+            <button id="minimalist-send" onclick="sendMinimalistMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: #0a0a0f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .minimalist-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .minimalist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .minimalist-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .minimalist-logo { font-size: 24px; }
+        .minimalist-badge {
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
+            color: #000;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .minimalist-chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.8;
+        }
+        .welcome-icon { font-size: 48px; margin-bottom: 16px; }
+        .welcome-message h2 { font-size: 24px; margin-bottom: 8px; }
+        .welcome-message p { color: #888; font-size: 14px; }
+        .chat-message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
+            color: #000;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-message.assistant {
+            align-self: flex-start;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-message.thinking {
+            opacity: 0.6;
+            font-style: italic;
+        }
+        .minimalist-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            background: #0d0d15;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        #minimalist-input {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+        }
+        #minimalist-input:focus { border-color: #00d9ff; }
+        #minimalist-send {
+            background: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
+            border: none;
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        #minimalist-send:hover { transform: scale(1.05); }
+        #minimalist-send svg { stroke: #000; }
+    </style>
+    `;
+
+    console.log('✨ Minimalist UI Initialized');
+}
+
+/**
+ * Add a message to the minimalist chat
+ */
+function addMinimalistMessage(role, content, isThinking = false) {
+    const chat = document.getElementById('minimalist-chat');
+    if (!chat) return;
+
+    // Remove welcome message on first chat
+    const welcome = chat.querySelector('.welcome-message');
+    if (welcome) welcome.remove();
+
+    const msgId = `msg-${Date.now()}`;
+    const msgDiv = document.createElement('div');
+    msgDiv.id = msgId;
+    msgDiv.className = `chat-message ${role}${isThinking ? ' thinking' : ''}`;
+    msgDiv.textContent = content;
+    chat.appendChild(msgDiv);
+    chat.scrollTop = chat.scrollHeight;
+
+    return msgId;
+}
+
+/**
+ * Update a minimalist message by ID
+ */
+function updateMinimalistMessage(msgId, content) {
+    const msg = document.getElementById(msgId);
+    if (msg) {
+        msg.textContent = content;
+        const chat = document.getElementById('minimalist-chat');
+        if (chat) chat.scrollTop = chat.scrollHeight;
+    }
+}
+
+/**
+ * Remove thinking message
+ */
+function removeThinkingMessage() {
+    const thinking = document.querySelector('.chat-message.thinking');
+    if (thinking) thinking.remove();
+}
+
+/**
+ * Send a message in minimalist mode
+ */
+async function sendMinimalistMessage() {
+    const input = document.getElementById('minimalist-input');
+    const prompt = input.value.trim();
+    if (!prompt) return;
+
+    // Clear input
+    input.value = '';
+
+    // Add user message
+    addMinimalistMessage('user', prompt);
+    state.chatHistory.push({ role: 'user', content: prompt });
+
+    // Run invisible council
+    await runInvisibleCouncil(prompt, state.minimalistMode);
+}
+
+// Initialize minimalist UI if in that mode
+document.addEventListener('DOMContentLoaded', () => {
+    if (state.minimalistMode) {
+        initMinimalistUI();
+    }
+});
+
+// Expose minimalist functions
+Object.assign(window, {
+    runInvisibleCouncil, sendMinimalistMessage, initMinimalistUI
+});
+
+console.log('🚀 Satya App v127 - Invisible Council Mode Ready');
+

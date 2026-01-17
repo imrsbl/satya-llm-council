@@ -3517,3 +3517,48 @@ body {
         scrollbar-width: none !important;
     }
 }
+
+/* ========================================
+   REFINED MOBILE TABS - SCROLLABLE ROW
+   ======================================== */
+@media (max-width: 768px) {
+    .nav-tabs {
+        display: flex !important; /* Restore visibility */
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 8px 12px !important;
+        background: #111116 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        position: relative !important;
+        z-index: 90 !important;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .nav-tab {
+        flex: 0 0 auto !important;
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        margin-right: 8px !important;
+    }
+
+    .nav-tab.active {
+        background: rgba(124, 58, 237, 0.2) !important;
+        border: 1px solid rgba(124, 58, 237, 0.3) !important;
+    }
+}
+
+/* FIX: Ensure DxO tab is always visible and readable */
+.nav-tab[data-tab="dxo"].active {
+    background: #ec4899 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
+}

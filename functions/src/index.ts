@@ -136,3 +136,101 @@ export const notionProxy = functions.https.onRequest(async (request, response) =
         });
     }
 });
+
+/**
+ * OpenRouter API Proxy Function
+ *
+ * This function proxies requests to OpenRouter API, allowing:
+ * 1. Server-side API key storage (more secure)
+ * 2. CORS bypass for browser requests
+ * 3. Streaming support for real-time responses
+ *
+ * Usage from client:
+ *   POST https://us-central1-satya-468b9.cloudfunctions.net/openrouterProxy
+ *   Body: { model: "...", messages: [...], stream: true }
+ *   Headers: { "X-OpenRouter-Key": "user-api-key" } (optional, uses server key if not provided)
+ */
+export const openrouterProxy = functions.https.onRequest(async (request, response) => {
+    // Handle CORS
+    if (setCorsHeaders(request, response)) {
+        return;
+    }
+
+    if (request.method !== "POST") {
+        response.status(405).json({ error: "Method not allowed" });
+        return;
+    }
+
+    try {
+        // Get API key: prefer user-provided, fallback to server config
+        const userApiKey = request.headers["x-openrouter-key"] as string;
+        const serverApiKey = process.env.OPENROUTER_API_KEY ||
+            functions.config().openrouter?.api_key;
+
+        const apiKey = userApiKey || serverApiKey;
+
+        if (!apiKey) {
+            response.status(400).json({
+                error: "API key required",
+                message: "Please provide OpenRouter API key via X-OpenRouter-Key header or configure server key",
+            });
+            return;
+        }
+
+        const isStreaming = request.body?.stream === true;
+
+        console.log(`OpenRouter proxy: ${request.body?.model}, streaming: ${isStreaming}`);
+
+        // Make request to OpenRouter API
+        const openrouterResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://satya-468b9.web.app",
+                "X-Title": "Satya AI Council",
+            },
+            body: JSON.stringify(request.body),
+        });
+
+        if (isStreaming) {
+            // Set up streaming response
+            response.set("Content-Type", "text/event-stream");
+            response.set("Cache-Control", "no-cache");
+            response.set("Connection", "keep-alive");
+
+            // @ts-ignore - node-fetch body is a readable stream
+            const reader = openrouterResponse.body;
+            if (reader) {
+                reader.on("data", (chunk: Buffer) => {
+                    response.write(chunk);
+                });
+                reader.on("end", () => {
+                    response.end();
+                });
+                reader.on("error", (err: Error) => {
+                    console.error("Stream error:", err);
+                    response.end();
+                });
+            } else {
+                response.status(500).json({ error: "No response stream" });
+            }
+        } else {
+            // Non-streaming: return JSON response
+            const responseData = await openrouterResponse.json();
+            response.status(openrouterResponse.status).json(responseData);
+        }
+
+    } catch (error: unknown) {
+        console.error("OpenRouter proxy error:", error);
+
+        const errorMessage = error instanceof Error
+            ? error.message
+            : "Unknown error";
+
+        response.status(500).json({
+            error: "Proxy error",
+            message: errorMessage,
+        });
+    }
+});

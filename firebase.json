@@ -10,7 +10,48 @@
             "**/.*",
             "**/node_modules/**",
             "functions/**",
-            "SatyaAndroid/**"
+            "SatyaAndroid/**",
+            "SatyaLite/**",
+            "SatyaPro/**"
+        ],
+        "headers": [
+            {
+                "source": "**/*.@(js|css)",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache, no-store, must-revalidate"
+                    }
+                ]
+            },
+            {
+                "source": "**/*.html",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache, no-store, must-revalidate"
+                    }
+                ]
+            },
+            {
+                "source": "version.txt",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache"
+                    }
+                ]
+            }
+        ],
+        "rewrites": [
+            {
+                "source": "/api/openrouter/**",
+                "function": "openrouterProxy"
+            },
+            {
+                "source": "/api/notion/**",
+                "function": "notionProxy"
+            }
         ]
     }
 }

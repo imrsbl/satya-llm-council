@@ -3330,3 +3330,79 @@ body {
 .nav-tab.active .mode-icon {
     stroke-width: 2.5;
 }
+
+/* ========================================
+   MOBILE HEADER FIX - SINGLE LINE LAYOUT
+   ======================================== */
+@media (max-width: 768px) {
+    .header {
+        flex-wrap: nowrap !important;
+        padding: 8px 12px !important;
+        gap: 8px !important;
+    }
+    
+    .header-left {
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+    }
+    
+    .logo {
+        min-width: auto;
+    }
+    
+    .logo-img {
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
+    .logo-text {
+        display: none !important;
+    }
+    
+    .nav-tabs {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        flex-shrink: 1;
+    }
+    
+    .nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .nav-tab {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+    }
+    
+    .header-right {
+        flex-shrink: 0;
+        gap: 6px !important;
+    }
+    
+    .ultra-mode-container .mode-label {
+        display: none !important;
+    }
+    
+    .ultra-toggle {
+        width: 36px !important;
+        height: 20px !important;
+    }
+}
+
+/* FIX: Ensure DxO tab text is always visible (white on pink) */
+.nav-tab.active {
+    color: white !important;
+}
+
+/* Remove conflicting colorful tab styles - text color should stay white when active */
+.nav-tab[data-tab="superchat"].active,
+.nav-tab[data-tab="council"].active,
+.nav-tab[data-tab="dxo"].active,
+.nav-tab[data-tab="ensemble"].active,
+.nav-tab[data-tab="benchmarks"].active,
+.nav-tab[data-tab="leaderboard"].active,
+.nav-tab[data-tab="history"].active {
+    color: white !important;
+}

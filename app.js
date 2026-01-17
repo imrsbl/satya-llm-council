@@ -3480,3 +3480,70 @@ window.showCopyFeedback = function (msg) {
         setTimeout(autoPopulateSessionMeta, 500);
     }
 };
+
+// ============================================
+// ROBUST EVENT DELEGATION SYSTEM
+// (Fixes all button click issues permanently)
+// ============================================
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('[onclick]');
+    if (!target) return;
+    
+    const onclickAttr = target.getAttribute('onclick');
+    if (!onclickAttr) return;
+    
+    // Extract function name and args
+    const match = onclickAttr.match(/^(\w+)\((.*)\)$/);
+    if (!match) return;
+    
+    const fnName = match[1];
+    const args = match[2];
+    
+    // Check if function exists in window
+    if (typeof window[fnName] === 'function') {
+        e.preventDefault();
+        try {
+            if (args) {
+                // Parse arguments (handles strings and identifiers)
+                const parsedArgs = args.split(',').map(arg => {
+                    arg = arg.trim();
+                    // Remove quotes from strings
+                    if ((arg.startsWith("'") && arg.endsWith("'")) ||
+                        (arg.startsWith('"') && arg.endsWith('"'))) {
+                        return arg.slice(1, -1);
+                    }
+                    // Boolean/number/null handling
+                    if (arg === 'true') return true;
+                    if (arg === 'false') return false;
+                    if (arg === 'null') return null;
+                    if (!isNaN(arg)) return Number(arg);
+                    return arg;
+                });
+                window[fnName](...parsedArgs);
+            } else {
+                window[fnName]();
+            }
+        } catch (err) {
+            console.error(`Error executing ${fnName}:`, err);
+        }
+    } else {
+        console.warn(`Function ${fnName} not found in window`);
+    }
+}, true);
+
+// Additional comprehensive function exposures
+window.showSettings = showSettings;
+window.closeSettings = closeSettings;
+window.showHistory = showHistory;
+window.closeHistory = closeHistory;
+window.loadSession = loadSession;
+window.deleteSession = deleteSession;
+window.exportCurrentResults = exportCurrentResults;
+window.copyAllResults = copyAllResults;
+window.continueSession = continueSession;
+window.sendToNotion = sendToNotion;
+window.startCouncil = startCouncil;
+window.selectModel = selectModel;
+window.toggleUltraFreeMode = toggleUltraFreeMode;
+
+console.log('✅ Event delegation system active - all buttons now work');

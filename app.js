@@ -2746,7 +2746,7 @@ function createHistoryItem(item) {
                 </div>
                 ${tagBadges}
             </div>
-            <button class="export-btn" onclick="event.stopPropagation(); exportHistoryItem(${item.id})">
+            <button class="export-btn" onclick="exportHistoryItem(${item.id})">
                 ↓ Export
             </button>
         </div>
@@ -3485,20 +3485,20 @@ window.showCopyFeedback = function (msg) {
 // ROBUST EVENT DELEGATION SYSTEM
 // (Fixes all button click issues permanently)
 // ============================================
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     const target = e.target.closest('[onclick]');
     if (!target) return;
-    
+
     const onclickAttr = target.getAttribute('onclick');
     if (!onclickAttr) return;
-    
+
     // Extract function name and args
     const match = onclickAttr.match(/^(\w+)\((.*)\)$/);
     if (!match) return;
-    
+
     const fnName = match[1];
     const args = match[2];
-    
+
     // Check if function exists in window
     if (typeof window[fnName] === 'function') {
         e.preventDefault();
@@ -3532,19 +3532,25 @@ document.addEventListener('click', function(e) {
 }, true);
 
 // Additional comprehensive function exposures
-window.showSettings = showSettings;
-window.closeSettings = closeSettings;
+window.viewHistoryItem = viewHistoryItem;
+window.exportHistoryItem = exportHistoryItem;
+window.historyFilterMode = historyFilterMode;
+window.switchTab = switchTab;
+window.toggleProfilePanel = toggleProfilePanel;
 window.showHistory = showHistory;
 window.closeHistory = closeHistory;
-window.loadSession = loadSession;
-window.deleteSession = deleteSession;
-window.exportCurrentResults = exportCurrentResults;
-window.copyAllResults = copyAllResults;
-window.continueSession = continueSession;
-window.sendToNotion = sendToNotion;
-window.startCouncil = startCouncil;
-window.selectModel = selectModel;
-window.toggleUltraFreeMode = toggleUltraFreeMode;
+window.logout = logout;
 
-console.log('✅ Event delegation system active - all buttons now work');
-console.log('🚀 Satya v126 - Ready');
+console.log('🚀 Satya App v126 Core Loaded');
+
+// FINAL COMPREHENSIVE WINDOW EXPOSURE
+Object.assign(window, {
+    showSettings, closeSettings, showHistory, closeHistory,
+    loadSession, deleteSession, exportCurrentResults, copyAllResults,
+    continueSession, sendToNotion, startCouncil, selectModel,
+    toggleUltraFreeMode, viewHistoryItem, exportHistoryItem,
+    switchTab, toggleProfilePanel, logout, triggerPhotoUpload,
+    handlePhotoUpload, saveProfileSettings, autoPopulateSessionMeta
+});
+
+console.log('🚀 Satya App v126.1 - All Systems Go');

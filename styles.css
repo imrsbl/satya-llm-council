@@ -3406,3 +3406,114 @@ body {
 .nav-tab[data-tab="history"].active {
     color: white !important;
 }
+
+/* ========================================
+   REFINED MOBILE HEADER - TRUE SINGLE LINE
+   ======================================== */
+@media (max-width: 768px) {
+    .header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        height: 60px !important;
+        padding: 0 10px !important;
+    }
+
+    .header-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    .logo {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .logo-img {
+        width: 30px !important;
+        height: 30px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .logo-text {
+        font-size: 16px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 60px !important;
+    }
+
+    .nav-tabs {
+        display: none !important; /* Hide tabs in main header on mobile to save space */
+    }
+
+    .header-right {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Move tabs to a second row only on mobile */
+    .mobile-tab-bar {
+        display: flex !important;
+        overflow-x: auto !important;
+        padding: 8px 10px !important;
+        background: var(--bg-secondary) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        scrollbar-width: none !important;
+    }
+}
+
+/* FIX: Ensure DxO tab text is highly visible */
+.nav-tab[data-tab="dxo"].active {
+    background: #ec4899 !important; /* Brighter pink */
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
+}
+
+/* ========================================
+   HEADER ROW MERGE FOR MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+    .header {
+        height: auto !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        padding: 8px 12px !important;
+        gap: 10px !important;
+    }
+
+    .header-left {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    .header-right {
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+
+    .logo-text {
+        font-size: 16px !important;
+        max-width: 70px !important;
+    }
+
+    /* Ensure tabs are below the header on mobile and scrollable */
+    .nav-tabs {
+        width: 100vw !important;
+        margin-left: -12px !important;
+        padding: 8px 12px !important;
+        background: var(--bg-secondary) !important;
+        border-top: 1px solid var(--border-color) !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+    }
+}
